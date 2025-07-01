@@ -1,0 +1,83 @@
+
+
+2. 📍 Track Order Status (Live updates)
+Show current status: Pending → Preparing → Out for Delivery → Delivered
+
+Use progress bar or timeline UI
+
+Auto update status using timeout or backend (socket if available)
+
+3. 💳 Payment Method Options
+Choose between Cash on Delivery, Card, etc.
+
+Save preferred method
+
+Mock logic for payment success/failure
+
+4. ⭐ Ratings & Feedback
+After order is delivered → ask for rating & comment
+
+Show feedback inside restaurant page
+
+Store feedbacks in Redux or backend (if used)
+
+5. ❤️ Wishlist / Favorite System
+Add/remove favorite menu items
+
+Show all favorites in a new Favorites.jsx page
+
+Easily reorder or add to cart from favorites
+
+6. 🔐 Login / Register Flow (Auth UI)
+Add simple login + register pages (email, password)
+
+Fake auth for now using Redux or localStorage
+
+Protect routes like /orders, /cart, /checkout
+
+7. 🧑‍🍳 Admin Features (Optional)
+Add/Remove Restaurants
+
+Add/Update Menu Items
+
+View All Orders
+
+⚙️ What Should We Build Next?
+Since you already have:
+
+✅ Cart
+
+✅ Checkout summary
+
+✅ Orders + cancel with timer
+
+Admin Panel (optional):
+
+Manage orders
+
+Change status to "Delivered"
+
+See all users’ orders
+
+User Account/Profile Page:
+
+View address history
+
+Update mobile/email
+
+See order history
+
+Wishlist / Favorite System
+
+Restaurant Dashboard:
+
+Restaurant owners can see their own orders
+
+Accept/Reject/Prepare status
+
+Search + Filter in /orders:
+
+Filter by status (pending, delivered)
+
+Sort by newest
+
