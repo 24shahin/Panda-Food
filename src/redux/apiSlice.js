@@ -50,7 +50,21 @@ export const apiSlice = createApi({
         body: userInfo,
       }),
     }),
+    updateProfile: builder.mutation({
+      query: (data) => ({
+        url: "/auth/profile",
+        method: "PUT",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // or from Redux
+        },
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = apiSlice;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useUpdateProfileMutation,
+} = apiSlice;

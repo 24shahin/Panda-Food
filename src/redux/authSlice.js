@@ -1,10 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-// Simulate API call URLs
-const API_BASE = "https://your-backend.com/api/auth";
+const API_BASE = "https://your-backend.com/api/auth"; // replace with your real API
 
-// Thunks for login and register
-
+// Thunks
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
@@ -16,7 +14,7 @@ export const loginUser = createAsyncThunk(
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
-      return data; // expected: { user: {...}, token: "..." }
+      return data; // { user: {...}, token: "..." }
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -41,13 +39,15 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Load user from localStorage (on app start)
+// Load from storage
 const userFromStorage = localStorage.getItem("user")
   ? JSON.parse(localStorage.getItem("user"))
   : null;
+const tokenFromStorage = localStorage.getItem("token") || null;
 
 const initialState = {
   user: userFromStorage,
+  token: tokenFromStorage,
   loading: false,
   error: null,
 };
@@ -58,12 +58,14 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.token = null;
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
     builder
-      // Login user
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -71,14 +73,16 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.token = action.payload.token;
         localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("token", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Login failed";
       })
 
-      // Register user
+      // Register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -86,7 +90,9 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.token = action.payload.token;
         localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("token", action.payload.token);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;

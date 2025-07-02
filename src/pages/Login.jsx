@@ -16,10 +16,17 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      //   const userData = await login({ email, password }).unwrap();
-      //   dispatch(setUser(userData.user));
+      // const userData = await login({ email, password }).unwrap();
+      // dispatch(setUser(userData.user));
       toast.success("Login successful!");
-      navigate("/");
+
+      // ✅ Role-based redirect
+      const role = userData?.user?.role;
+      if (role === "admin") {
+        navigate("/admin/orders");
+      } else {
+        navigate("/orders");
+      }
     } catch (err) {
       toast.error(err?.data?.message || "Login failed");
     }

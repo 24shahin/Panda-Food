@@ -16,8 +16,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./pages/Profile";
+import useAutoLogout from "./hooks/useAutoLogout";
 
 export default function App() {
+  useAutoLogout();
   return (
     <Router>
       <Toaster position="top-right" reverseOrder={false} />
@@ -36,6 +39,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />
