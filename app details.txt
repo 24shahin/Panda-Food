@@ -80,4 +80,108 @@ Search + Filter in /orders:
 Filter by status (pending, delivered)
 
 Sort by newest
+=======================================================
+=======================================================
+🛡️ 2. Auto Redirect Based on Role
+If logged-in user is admin → go to /admin/orders
 
+If normal user → go to /orders or /
+
+🗂️ 3. User Profile Page
+Route: /profile
+
+Show/update user info (name, email, etc.)
+
+Optional: change password
+
+🔄 4. Token Expiry & Auto-Logout
+Detect JWT expiration
+
+Automatically logout and redirect to login
+
+❤️ 5. Wishlist / Favorites Feature
+User can ❤️ save dishes
+
+View saved items on a dedicated page /favorites
+
+💬 6. Comments & Ratings on Restaurants
+Let users leave a rating + comment
+
+Show total average rating
+
+Sort restaurants by rating/popularity
+
+📊 7. Admin Dashboard Analytics
+Show total users, orders, revenue
+
+Visual stats with charts (use recharts or chart.js)
+
+🖼️ 8. Image Upload for Restaurant or Menu Items
+Let admin upload photos
+
+Store on Cloudinary / local server
+=======================================================
+=======================================================
+
+this is folder structure for this app
+src/
+├── App.jsx                         # App layout + routes
+├── main.jsx                        # Entry point with Redux + Router
+├── index.css                       # Tailwind or global styles
+
+│
+├── assets/                         # Static files (logos, images, icons)
+│   └── logo.png
+│   └── loading.gif
+│
+├── components/                     # Reusable UI components
+│   ├── RestaurantCard.jsx ✅
+│   ├── MenuItemCard.jsx ✅
+│   ├── CartItem.jsx ✅
+│   ├── Navbar.jsx ✅
+│   ├── Footer.jsx ✅
+│   ├── RatingStars.jsx 🆕
+│   ├── CommentBox.jsx 🆕
+│   ├── Toast.jsx 🆕
+│   ├── Modal.jsx 🆕
+│   ├── Loader.jsx 🆕
+│   └── ProtectedRoute.jsx ❌ *(Step 3 - Role-based)*
+│
+├── context/                        # App-level context providers (if needed)
+│   ├── ThemeContext.jsx ✅ (Dark/Light)
+│   └── AuthContext.jsx ❌ *(Optional — if not using Redux for auth)*
+│
+├── pages/                          # Main screens / route-level pages
+│   ├── Home.jsx ✅
+│   ├── RestaurantDetails.jsx ✅
+│   ├── Cart.jsx ✅
+│   ├── Checkout.jsx ✅
+│   ├── Orders.jsx ✅
+│   ├── DeliveryAddressForm.jsx ✅
+│   ├── Login.jsx ✅
+│   ├── Register.jsx ✅
+│   ├── AdminDashboard.jsx ❌ *(After login & role check)*
+│   └── UserProfile.jsx 🆕 *(Edit profile, order history, address, etc.)*
+
+│
+├── redux/                          # Global Redux state slices
+│   ├── store.js ✅
+│   ├── cartSlice.js ✅
+│   ├── ordersSlice.js ✅
+│   ├── authSlice.js ✅
+│   └── userSlice.js 🆕 *(Wishlist, Profile Info, Saved Items etc.)*
+
+│
+├── router/                         # Custom route logic
+│   └── ProtectedRoutes.jsx ❌ *(Step 3 - Only allow auth/admin access)*
+
+│
+├── utils/                          # Helper functions
+│   ├── authHelpers.js ❌ *(Get token, decode user role, etc.)*
+│   ├── api.js 🆕 *(Centralized fetch handler with baseURL, token)*
+│   └── timeUtils.js 🆕 *(Countdown timers, date formatters)*
+
+│
+└── constants/                      # App constants or config
+    ├── roles.js 🆕 *(USER, ADMIN)*
+    └── routes.js 🆕 *(All route paths in one file for reuse)*

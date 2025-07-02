@@ -12,6 +12,11 @@ import AddressForm from "./pages/DeliveryAddressForm";
 import OrderDetails from "./pages/OrderDetails";
 import AdminOrders from "./pages/AdminOrders";
 
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+
 export default function App() {
   return (
     <Router>
@@ -20,15 +25,61 @@ export default function App() {
         <Header />
         <main className="flex-1">
           <Routes>
-            <Route path="/admin/orders" element={<AdminOrders />} />
+            {/* ✅ Public Routes */}
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} /> {/* ✅ Added */}
+            <Route path="/register" element={<Register />} /> {/* ✅ Added */}
             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/deliveryaddress" element={<AddressForm />} />
-            <Route path="/orders/:id" element={<OrderDetails />} />
-            {/* Add more routes here */}
+            {/* ✅ Protected User Routes */}
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders/:id"
+              element={
+                <ProtectedRoute>
+                  <OrderDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/deliveryaddress"
+              element={
+                <ProtectedRoute>
+                  <AddressForm />
+                </ProtectedRoute>
+              }
+            />
+            {/* ✅ Protected Admin Route */}
+            <Route
+              path="/admin/orders"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminOrders />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
         <Footer />
