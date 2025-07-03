@@ -1,9 +1,8 @@
-// src/hooks/useAutoLogout.js
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { isTokenExpired } from "../utils/tokenUtils";
+import { useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
+import { isTokenExpired } from "../utils/tokenUtils";
 
 export default function useAutoLogout() {
   const dispatch = useDispatch();
@@ -11,23 +10,11 @@ export default function useAutoLogout() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if (!token) return; // ✅ Don't redirect if there's no token
 
-    if (!token || isTokenExpired(token)) {
+    if (isTokenExpired(token)) {
       dispatch(logout());
       navigate("/login");
-      return;
     }
-
-    // Optional: Set timer to auto logout exactly when token expires
-    const { exp } = JSON.parse(atob(token.split(".")[1]));
-    const expiryTime = exp * 1000 - Date.now();
-
-    const timer = setTimeout(() => {
-      dispatch(logout());
-      navigate("/login");
-      toast.info("Session expired, please login again.");
-    }, expiryTime);
-
-    return () => clearTimeout(timer);
   }, [dispatch, navigate]);
 }

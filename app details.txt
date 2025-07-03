@@ -118,12 +118,67 @@ Visual stats with charts (use recharts or chart.js)
 
 🖼️ 8. Image Upload for Restaurant or Menu Items
 Let admin upload photos
+✅ Next Step
+Once the form is submitted and restaurant created:
+➡️ We’ll build the Menu Management System, so restaurant owners can:
 
+🧾 Add new menu items
+
+✏️ Edit or delete existing ones
+
+🖼️ Upload item image (via backend to Cloudinary)
+
+Let me know when you're done with the restaurant setup form — and we’ll continue!
 Store on Cloudinary / local server
 =======================================================
 =======================================================
+ei porjonto hoise
+src/
+├── App.jsx
+├── main.jsx
+├── index.css
+├── assets/
+│   └── (logo/images if needed)
+├── components/
+│   ├── Header.jsx
+│   ├── Footer.jsx
+│   ├── RestaurantCard.jsx
+│   ├── ProtectedRoute.jsx
+│   └── ImageUploader.jsx ✅ (if using Cloudinary frontend upload)
+├── context/
+│   └── (if you add Theme or Auth Context later)
+├── hooks/
+│   └── useAutoLogout.js ✅
+├── pages/
+│   ├── Home.jsx
+│   ├── RestaurantDetails.jsx
+│   ├── Cart.jsx
+│   ├── Checkout.jsx
+│   ├── Orders.jsx
+│   ├── OrderDetails.jsx
+│   ├── DeliveryAddressForm.jsx
+│   ├── Login.jsx
+│   ├── Register.jsx
+│   ├── Profile.jsx
+│   ├── AdminOrders.jsx
+│   ├── AdminDashboard.jsx ✅
+│   └── RestaurantSetupForm.jsx ✅
+├── redux/
+│   ├── store.js
+│   ├── cartSlice.js
+│   ├── ordersSlice.js
+│   ├── authSlice.js ✅
+│   └── apiSlice.js ✅ (RTK Query base)
+├── router/
+│   └── (Optional if using a router config file)
+├── utils/
+│   ├── cloudinary.js ✅ (if uploading from frontend)
+│   └── tokenUtils.js ✅
 
-this is folder structure for this app
+=======================================================
+=======================================================
+
+this is folder structure for this app ...next ei gula pabo
 src/
 ├── App.jsx                         # App layout + routes
 ├── main.jsx                        # Entry point with Redux + Router

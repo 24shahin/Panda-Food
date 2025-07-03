@@ -14,15 +14,27 @@ import AdminOrders from "./pages/AdminOrders";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
-import Profile from "./pages/Profile";
 import useAutoLogout from "./hooks/useAutoLogout";
+import AdminDashboard from "./pages/AdminDashboard";
+import RestaurantSetupForm from "./pages/RestaurantSetupForm";
 
 export default function App() {
-  useAutoLogout();
   return (
     <Router>
+      <AppContent />
+    </Router>
+  );
+}
+
+// ✅ Separate component so hook can be used properly
+function AppContent() {
+  useAutoLogout(); // ✅ safe to use here
+
+  return (
+    <>
       <Toaster position="top-right" reverseOrder={false} />
       <div className="min-h-screen flex flex-col bg-backgroundLight dark:bg-backgroundDark text-black dark:text-white transition-colors duration-300">
         <Header />
@@ -30,9 +42,10 @@ export default function App() {
           <Routes>
             {/* ✅ Public Routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} /> {/* ✅ Added */}
-            <Route path="/register" element={<Register />} /> {/* ✅ Added */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
+
             {/* ✅ Protected User Routes */}
             <Route
               path="/cart"
@@ -82,7 +95,8 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            {/* ✅ Protected Admin Route */}
+
+            {/* ✅ Admin Route */}
             <Route
               path="/admin/orders"
               element={
@@ -91,10 +105,26 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/restaurant/setup"
+              element={
+                <ProtectedRoute>
+                  <RestaurantSetupForm />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
         <Footer />
       </div>
-    </Router>
+    </>
   );
 }
