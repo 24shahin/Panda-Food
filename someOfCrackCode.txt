@@ -2,8 +2,6 @@ Cloudinary Email: shahinprodhan724@gmail.com
 Cloudinary password: Shahin10#@
 
 
-CLOUD_NAME = dfo4erali
-CLOUD_API_KEY = 221448247393636
-CLOUD_API_SECRET = LBV7bgYRm6NKJomdc6NRVw2bXEE
+
 
 API environment variable = CLOUDINARY_URL=cloudinary://221448247393636:LBV7bgYRm6NKJomdc6NRVw2bXEE@dfo4erali

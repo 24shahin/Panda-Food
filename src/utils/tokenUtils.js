@@ -1,12 +1,10 @@
 // src/utils/tokenUtils.js
-import { jwtDecode } from "jwt-decode";
-
-export const isTokenExpired = (token) => {
-  if (!token) return true;
+export function isTokenExpired(token) {
   try {
-    const { exp } = jwtDecode(token);
-    return Date.now() >= exp * 1000;
-  } catch {
-    return true;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const exp = payload.exp * 1000; // Convert to milliseconds
+    return Date.now() > exp;
+  } catch (err) {
+    return true; // treat error as expired
   }
-};
+}

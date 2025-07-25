@@ -1,22 +1,18 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-// import { useRegisterMutation } from "../redux/authApiSlice";
-// import { setUser } from "../redux/authSlice";
+import { useRegisterMutation } from "../redux/apiSlice";
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  //   const [register, { isLoading, error }] = useRegisterMutation();
-  const dispatch = useDispatch();
+  const [register, { isLoading, error }] = useRegisterMutation();
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      //   const userData = await register(form).unwrap();
-      //   dispatch(setUser(userData.user));
+      const userData = await register(form).unwrap();
       toast.success("Registration successful!");
       navigate("/");
     } catch (err) {
@@ -89,16 +85,16 @@ export default function Register() {
 
         <button
           type="submit"
-          //   disabled={isLoading}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-300">
-          {/* {isLoading ? "Registering..." : "Register"} */}Register
+          disabled={isLoading}
+          className="w-full bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-300">
+          {isLoading ? "Registering..." : "Register"}
         </button>
 
-        {/* {error && (
+        {error && (
           <p className="text-red-500 text-sm text-center mt-2">
             {error.data?.message || "Registration failed"}
           </p>
-        )} */}
+        )}
 
         <p className="text-center text-sm mt-4 text-gray-500 dark:text-gray-400">
           Already have an account?{" "}

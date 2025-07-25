@@ -1,5 +1,5 @@
 // src/pages/Home.jsx
-import React from "react";
+import React, { useState } from "react";
 import HeroSection from "../components/HeroSection";
 import RestaurantCard from "../components/RestaurantCard";
 
@@ -70,7 +70,7 @@ const restaurantData = [
   },
 ];
 
-export default function Home() {
+export default function Home({ getAllRestaurant, isLoading }) {
   return (
     <div className="min-h-screen bg-backgroundLight dark:bg-backgroundDark transition-colors duration-300">
       <HeroSection />
@@ -81,12 +81,16 @@ export default function Home() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {restaurantData.map((restaurant) => (
-            <RestaurantCard
-              key={restaurant._id}
-              restaurantDetails={restaurant}
-            />
-          ))}
+          {isLoading == false ? (
+            getAllRestaurant.map((restaurant) => (
+              <RestaurantCard
+                key={restaurant._id}
+                restaurantDetails={restaurant}
+              />
+            ))
+          ) : (
+            <h2 className="flex justify-center items-center">Loading . . .</h2>
+          )}
         </div>
       </section>
     </div>

@@ -1,34 +1,42 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-// import { useLoginMutation } from "../redux/authApiSlice";
-// import { setUser } from "../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../redux/authSlice"; // Thunk
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  //   const [login, { isLoading, error }] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { user, loading, error } = useSelector((state) => state.auth);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // const userData = await login({ email, password }).unwrap();
-      // dispatch(setUser(userData.user));
+      const result = await dispatch(loginUser({ email, password })).unwrap();
       toast.success("Login successful!");
 
-      // ✅ Role-based redirect
-      const role = userData?.user?.role;
+      const role = result?.user?.role;
+      const id = result?.user?._id;
+
+      if (!role || !id) {
+        return toast.error("Login error: Missing user info.");
+      }
+
+      // ✅ Role-based navigation
       if (role === "admin") {
         navigate("/admin/orders");
+      } else if (role === "restaurant") {
+        navigate(`/restaurant/${id}`);
       } else {
         navigate("/orders");
       }
     } catch (err) {
-      toast.error(err?.data?.message || "Login failed");
+      toast.error(err || "Login failed");
     }
   };
 
@@ -83,16 +91,14 @@ export default function Login() {
 
         <button
           type="submit"
-          //   disabled={isLoading}
-          className="w-full bg-primary hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-xl transition duration-300">
-          {/* {isLoading ? "Logging in..." : "Login"} */} login
+          disabled={loading}
+          className="w-full bg-primary cursor-pointer hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-xl transition duration-300">
+          {loading ? "Logging in..." : "Login"}
         </button>
 
-        {/* {error && (
-          <p className="text-red-500 text-sm text-center mt-2">
-            {error.data?.message || "Login failed"}
-          </p>
-        )} */}
+        {error && (
+          <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+        )}
 
         <p className="text-center text-sm mt-4 text-gray-500 dark:text-gray-400">
           Don’t have an account?{" "}

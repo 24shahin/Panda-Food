@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Header from "./components/Header";
@@ -20,6 +20,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import useAutoLogout from "./hooks/useAutoLogout";
 import AdminDashboard from "./pages/AdminDashboard";
 import RestaurantSetupForm from "./pages/RestaurantSetupForm";
+import Dashboard from "./pages/restaurant/Dashboard";
+import { useGetAllRestaurantQuery } from "./redux/apiSlice";
+import NewMenuAdd from "./components/Restaurant/NewMenuAdd";
 
 export default function App() {
   return (
@@ -29,9 +32,14 @@ export default function App() {
   );
 }
 
-// ✅ Separate component so hook can be used properly
 function AppContent() {
-  useAutoLogout(); // ✅ safe to use here
+  useAutoLogout();
+  const [getAllRestaurant, setGetAllRestaurant] = useState([]);
+  const { data: allRestaurant, isLoading } = useGetAllRestaurantQuery();
+
+  useEffect(() => {
+    if (allRestaurant) setGetAllRestaurant(allRestaurant);
+  }, [allRestaurant]);
 
   return (
     <>
@@ -40,13 +48,18 @@ function AppContent() {
         <Header />
         <main className="flex-1">
           <Routes>
-            {/* ✅ Public Routes */}
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={
+                <Home
+                  getAllRestaurant={getAllRestaurant}
+                  isLoading={isLoading}
+                />
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
-
-            {/* ✅ Protected User Routes */}
             <Route
               path="/cart"
               element={
@@ -95,8 +108,6 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
-
-            {/* ✅ Admin Route */}
             <Route
               path="/admin/orders"
               element={
@@ -110,6 +121,22 @@ function AppContent() {
               element={
                 <ProtectedRoute adminOnly={true}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/restaurantOwner/dashboard"
+              element={
+                <ProtectedRoute restaurantOwner={true}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/restaurantOwner/addmenu"
+              element={
+                <ProtectedRoute restaurantOwner={true}>
+                  <NewMenuAdd />
                 </ProtectedRoute>
               }
             />

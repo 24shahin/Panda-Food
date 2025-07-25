@@ -3,141 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import MenuItemCard from "../components/MenuItemCard";
 import { MapPin, Star, MessageSquare } from "lucide-react";
 import OutSideClick from "../functions/click";
-import { useParams } from "react-router-dom";
-
-const restaurant = {
-  name: "Pizza Palace",
-  _id: 1,
-  location: "123 Main St, New York",
-  rating: 4.7,
-  images: [
-    "https://t3.ftcdn.net/jpg/03/24/73/92/360_F_324739203_keeq8udvv0P2h1MLYJ0GLSlTBagoXS48.jpg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ0EqHI6h5QgFTXGG_1i2FADG1xulRbVtecA&s",
-    "https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-  ],
-  menu: [
-    {
-      _id: 1,
-      name: "Pepperoni Pizza",
-      image: "https://source.unsplash.com/featured/?pepperoni-pizza",
-      price: "12.99",
-      rating: 4.5,
-      sold: 230,
-    },
-    {
-      _id: 2,
-      name: "BBQ Chicken Pizza",
-      image: "https://source.unsplash.com/featured/?bbq-chicken-pizza",
-      price: "13.99",
-      rating: 4.6,
-      sold: 189,
-    },
-    {
-      _id: 3,
-      name: "Veggie Delight",
-      image: "https://source.unsplash.com/featured/?veggie-pizza",
-      price: "11.99",
-      rating: 4.2,
-      sold: 112,
-    },
-    {
-      _id: 4,
-      name: "Margherita",
-      image: "https://source.unsplash.com/featured/?margherita",
-      price: "10.99",
-      rating: 4.7,
-      sold: 321,
-    },
-    {
-      _id: 5,
-      name: "Cheesy Crust Pizza",
-      image: "https://source.unsplash.com/featured/?cheese-pizza",
-      price: "14.50",
-      rating: 4.8,
-      sold: 275,
-    },
-    {
-      _id: 6,
-      name: "Hawaiian Pizza",
-      image: "https://source.unsplash.com/featured/?hawaiian-pizza",
-      price: "13.25",
-      rating: 4.4,
-      sold: 187,
-    },
-    {
-      _id: 7,
-      name: "Meat Lovers",
-      image: "https://source.unsplash.com/featured/?meat-pizza",
-      price: "15.99",
-      rating: 4.6,
-      sold: 244,
-    },
-    {
-      _id: 8,
-      name: "Spinach & Feta",
-      image: "https://source.unsplash.com/featured/?spinach-pizza",
-      price: "12.25",
-      rating: 4.5,
-      sold: 132,
-    },
-    {
-      _id: 9,
-      name: "Buffalo Chicken",
-      image: "https://source.unsplash.com/featured/?buffalo-pizza",
-      price: "14.75",
-      rating: 4.7,
-      sold: 211,
-    },
-    {
-      _id: 10,
-      name: "Mushroom Pizza",
-      image: "https://source.unsplash.com/featured/?mushroom-pizza",
-      price: "11.75",
-      rating: 4.3,
-      sold: 165,
-    },
-    {
-      _id: 11,
-      name: "Four Cheese Pizza",
-      image: "https://source.unsplash.com/featured/?cheese",
-      price: "14.00",
-      rating: 4.9,
-      sold: 198,
-    },
-    {
-      _id: 12,
-      name: "Garlic Bread Pizza",
-      image: "https://source.unsplash.com/featured/?garlic-pizza",
-      price: "9.99",
-      rating: 4.1,
-      sold: 94,
-    },
-    {
-      _id: 13,
-      name: "Paneer Tikka Pizza",
-      image: "https://source.unsplash.com/featured/?paneer-pizza",
-      price: "13.50",
-      rating: 4.6,
-      sold: 153,
-    },
-    {
-      _id: 14,
-      name: "Tandoori Chicken Pizza",
-      image: "https://source.unsplash.com/featured/?tandoori-pizza",
-      price: "14.99",
-      rating: 4.7,
-      sold: 175,
-    },
-    {
-      _id: 15,
-      name: "Supreme Pizza",
-      image: "https://source.unsplash.com/featured/?supreme-pizza",
-      price: "15.25",
-      rating: 4.8,
-      sold: 210,
-    },
-  ],
-};
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import {
+  useMyRestaurantQuery,
+  useSelectedRestaurantQuery,
+} from "../redux/apiSlice";
+import { CiMenuKebab } from "react-icons/ci";
+import AddMenu from "../components/Restaurant/AddMenu";
 
 const sampleComments = [
   {
@@ -164,28 +37,79 @@ const sampleComments = [
 ];
 
 export default function RestaurantDetails() {
+  const userInfo = useSelector((state) => state?.auth);
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const isVisitor = !!id;
+  const isOwner = userInfo?.user?.role === "restaurant" && !id;
+
+  const { data: selectedRestaurant } = useSelectedRestaurantQuery(id, {
+    skip: !isVisitor,
+  });
+  const { data: myRestaurantDetails, isLoading } = useMyRestaurantQuery(
+    undefined,
+    { skip: !isOwner }
+  );
+
+  const [restaurants, setRestaurants] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [comment, setComment] = useState("");
   const [commentBoxShow, setCommentBoxShow] = useState(false);
   const [userCommentShow, setUserCommentShow] = useState(false);
+  const [menu, setMenu] = useState(false);
+
+  const MenuRef = useRef(null);
   const commentRef = useRef(null);
   const userCommentShowRef = useRef(null);
+
+  OutSideClick(MenuRef, () => setMenu(false));
   OutSideClick(commentRef, () => setCommentBoxShow(false));
   OutSideClick(userCommentShowRef, () => setUserCommentShow(false));
+
   useEffect(() => {
+    if (isOwner && myRestaurantDetails) {
+      setRestaurants(myRestaurantDetails);
+    } else if (isVisitor && selectedRestaurant) {
+      setRestaurants(selectedRestaurant);
+    }
+  }, [isOwner, isVisitor, myRestaurantDetails, selectedRestaurant]);
+
+  useEffect(() => {
+    if (!restaurants?.images) return;
+
     const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % restaurant.images.length);
+      setCurrentImageIndex((prev) => (prev + 1) % restaurants.images.length);
     }, 4000);
+
     return () => clearInterval(interval);
-  }, []);
-  const { id } = useParams();
+  }, [restaurants]);
+
+  if (isLoading || !restaurants) {
+    return (
+      <h1 className="text-2xl text-primary font-extrabold w-full h-screen flex items-center justify-center">
+        Loading . . .
+      </h1>
+    );
+  }
+
+  const userId = id === undefined ? userInfo?.user?._id : id;
+  const visitor = userInfo?.user?._id === restaurants?.user;
+
+  if (isLoading || !restaurants) {
+    return (
+      <h1 className="text-2xl text-primary font-extrabold w-full h-screen flex items-center justify-center">
+        Loading . . .
+      </h1>
+    );
+  }
 
   return (
     <div className="bg-backgroundLight dark:bg-backgroundDark text-black dark:text-white min-h-screen">
       {/* Sticky Header */}
       <div className="sticky top-0 z-30 bg-primary dark:bg-surfaceDark px-4 py-3 shadow-md dark:bg-backgroundDark  text-white">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center ">
-          <h2 className="text-xl font-semibold w-1/2">{restaurant.name}</h2>
+          <h2 className="text-xl font-semibold w-1/2">{restaurants.name}</h2>
           <div className="relative w-1/2 justify-end flex gap-x-5">
             <button
               className="text-white cursor-pointer bg-secondary/30 px-3 py-1 rounded-md hover:bg-secondary/50 flex items-center justify-end"
@@ -193,12 +117,37 @@ export default function RestaurantDetails() {
               <MessageSquare className="inline-block w-4 h-4 mr-1" />
               See User's Comment
             </button>
-            <button
-              className="text-white cursor-pointer bg-secondary/30 px-3 py-1 rounded-md hover:bg-secondary/50 flex items-center justify-end"
-              onClick={() => setCommentBoxShow(true)}>
-              <MessageSquare className="inline-block w-4 h-4 mr-1" />
-              leave a Comment
-            </button>
+            {!visitor && (
+              <button
+                className="text-white cursor-pointer bg-secondary/30 px-3 py-1 rounded-md hover:bg-secondary/50 flex items-center justify-end"
+                onClick={() => setCommentBoxShow(true)}>
+                <MessageSquare className="inline-block w-4 h-4 mr-1" />
+                leave a Comment
+              </button>
+            )}
+            {visitor && (
+              <div className="relative">
+                <div
+                  className="text-white cursor-pointer bg-secondary/30 px-3 py-2 rounded-md hover:bg-secondary/50 flex items-center justify-end"
+                  onClick={() => setMenu(true)}>
+                  <CiMenuKebab className="inline-block" />
+                </div>
+                {menu && (
+                  <div
+                    className="absolute w-[400px] right-0 top-9 h-[200px] bg-[#885353f3] p-5 shadow-lg"
+                    ref={MenuRef}>
+                    <h3 className="text-lg mb-3">
+                      Restaurant Details and add somethings
+                    </h3>
+                    <button
+                      className="text-white cursor-pointer bg-secondary/30 px-3 py-1 rounded-md hover:bg-secondary/50 flex items-center justify-end"
+                      onClick={() => navigate("/restaurantOwner/addmenu")}>
+                      Add a Menu item
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
             {/* comment section */}
             {userCommentShow && (
               <div
@@ -243,38 +192,61 @@ export default function RestaurantDetails() {
       <div className="w-full h-64 overflow-hidden relative">
         <AnimatePresence mode="wait">
           <motion.img
-            key={restaurant.images[currentImageIndex]}
-            src={restaurant.images[currentImageIndex]}
+            key={restaurants?.images?.[currentImageIndex]}
+            src={restaurants?.images?.[currentImageIndex]}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8 }}
-            alt={`Slide ${currentImageIndex}`}
+            alt={`image`}
             className="w-full h-full object-cover brightness-75 absolute inset-0"
           />
         </AnimatePresence>
         <div className="absolute bottom-4 left-[52px] text-white z-10">
-          <h1 className="text-3xl font-bold">{restaurant.name}</h1>
+          <h1 className="text-3xl font-bold">{restaurants.name}</h1>
           <p className="text-sm flex items-center mt-1">
-            <MapPin className="w-4 h-4 mr-1" /> {restaurant.location}
+            <MapPin className="w-4 h-4 mr-1" /> {restaurants.location}
           </p>
           <p className="text-sm flex items-center mt-1">
             <Star className="w-4 h-4 mr-1 text-yellow-300" />{" "}
-            {restaurant.rating} / 5
+            {restaurants.rating} / 5
+          </p>
+          <p className="text-sm flex items-center mt-1">
+            Email : {restaurants.email}
+          </p>
+          <p className="text-sm flex items-center mt-1">
+            Contact : {restaurants.contactNumber}
           </p>
         </div>
       </div>
 
       {/* Menu List */}
       <div className="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 gap-4">
-        {restaurant.menu.map((item) => (
-          <MenuItemCard
-            key={item._id}
-            item={item}
-            restaurantId={restaurant._id}
-            restaurantName={restaurant.name}
-          />
-        ))}
+        {restaurants?.restaurantMenuItem &&
+          (restaurants?.restaurantMenuItem.length > 0 ? (
+            restaurants?.restaurantMenuItem
+              .slice()
+              .sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+              })
+              .map((item, index) => (
+                <motion.div
+                  key={item._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}>
+                  <AddMenu
+                    item={item}
+                    visitor={visitor}
+                    restaurantName={restaurants.name}
+                  />
+                </motion.div>
+              ))
+          ) : (
+            <span>You need to add menu item for your restaurant</span>
+          ))}
+        <h3>Add Restaurant Items and see </h3>
       </div>
       {/* comment Box */}
       {commentBoxShow && (

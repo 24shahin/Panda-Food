@@ -3,7 +3,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
-export default function ProtectedRoute({ children, adminOnly = false }) {
+export default function ProtectedRoute({
+  children,
+  adminOnly = false,
+  restaurantOwner = false,
+}) {
   const user = useSelector((state) => state.auth.user);
 
   if (!user) {
@@ -11,6 +15,9 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
   }
 
   if (adminOnly && user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+  if (restaurantOwner && user.role !== "restaurant") {
     return <Navigate to="/" replace />;
   }
 

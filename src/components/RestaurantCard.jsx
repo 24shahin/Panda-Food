@@ -12,7 +12,7 @@ export default function RestaurantCard({ restaurantDetails }) {
       className="rounded-2xl overflow-hidden shadow-md dark:shadow-lg dark:bg-surfaceDark hover:shadow-xl transition">
       <img
         src={
-          restaurantDetails.image ||
+          restaurantDetails.images[0] ||
           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV0Rlx-5354Vf5J0ejVBQPNjte0dYccIZeGw&s"
         }
         alt="Restaurant"
@@ -26,16 +26,16 @@ export default function RestaurantCard({ restaurantDetails }) {
           {restaurantDetails.rating}⭐
         </p>
         <div className="flex flex-wrap gap-1 mb-4">
-          {restaurantDetails.items.map((item, idx) => (
+          {/* {restaurantDetails.items.map((item, idx) => (
             <span
               key={idx}
               className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">
               {item}
             </span>
-          ))}
+          ))} */}
         </div>
         <Link
-          to={`/restaurant/${restaurantDetails._id}`}
+          to={`/restaurant/${restaurantDetails?.user}`}
           className="inline-block bg-primary hover:bg-primary/90 text-white text-sm px-4 py-2 rounded-xl cursor-pointer">
           View Menu
         </Link>

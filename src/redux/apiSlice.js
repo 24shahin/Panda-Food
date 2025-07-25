@@ -1,63 +1,60 @@
-// import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-// // Replace with your actual backend URL
-// const BASE_URL = "https://your-backend.com/api/auth";
-
-// export const authApi = createApi({
-//   reducerPath: "authApi",
-//   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
-//   endpoints: (builder) => ({
-//     login: builder.mutation({
-//       query: (credentials) => ({
-//         url: "/login",
-//         method: "POST",
-//         body: credentials,
-//       }),
-//     }),
-//     register: builder.mutation({
-//       query: (userInfo) => ({
-//         url: "/register",
-//         method: "POST",
-//         body: userInfo,
-//       }),
-//     }),
-//   }),
-// });
-
-// export const { useLoginMutation, useRegisterMutation } = authApi;
-
-// src/redux/apiSlice.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-// Set your backend API base URL here
-const BASE_URL = "https://your-backend.com/api";
-
 export const apiSlice = createApi({
   reducerPath: "api", // key in the Redux state
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_BACKEND_URL2,
+    prepareHeaders: (headers) => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user && user.token) {
+        headers.set("Authorization", `Bearer ${user.token}`);
+      }
+      return headers;
+    },
+  }),
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
-        url: "/login",
+        url: "api/users/login",
         method: "POST",
         body: credentials,
       }),
     }),
     register: builder.mutation({
       query: (userInfo) => ({
-        url: "/register",
+        url: "api/users/register",
         method: "POST",
         body: userInfo,
       }),
     }),
-    updateProfile: builder.mutation({
-      query: (data) => ({
-        url: "/auth/profile",
-        method: "PUT",
-        body: data,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // or from Redux
-        },
+
+    uploadImages: builder.mutation({
+      query: ({ formData }) => ({
+        url: "/api/upload/images",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    registerRestaurant: builder.mutation({
+      query: ({ name, location, contactNumber, email, images }) => ({
+        url: "/api/restaurants/registerrestaurant",
+        method: "POST",
+        body: { name, location, contactNumber, email, images },
+      }),
+    }),
+    myRestaurant: builder.query({
+      query: (userId) => `/api/restaurants/my/${userId}`,
+    }),
+    selectedRestaurant: builder.query({
+      query: (id) => `/api/restaurants/selectedrestaurant/${id}`,
+    }),
+    getAllRestaurant: builder.query({
+      query: () => `/api/restaurants/allrestaurant`,
+    }),
+    addMenuItem: builder.mutation({
+      query: ({ name, description, price, image, category, available }) => ({
+        url: "/api/menu-items/",
+        method: "POST",
+        body: { name, description, price, image, category, available },
       }),
     }),
   }),
@@ -66,5 +63,10 @@ export const apiSlice = createApi({
 export const {
   useLoginMutation,
   useRegisterMutation,
-  useUpdateProfileMutation,
+  useUploadImagesMutation,
+  useRegisterRestaurantMutation,
+  useMyRestaurantQuery,
+  useGetAllRestaurantQuery,
+  useAddMenuItemMutation,
+  useSelectedRestaurantQuery,
 } = apiSlice;

@@ -46,7 +46,7 @@ export default function HeroSection() {
         <img
           src="https://cdn.pixabay.com/photo/2017/05/07/08/56/food-2290877_960_720.jpg"
           alt="hero food"
-          className="rounded-xl shadow-lg w-full object-cover h-64 md:h-80 lg:h-96"
+          className="rounded-xl w-full object-cover h-64 md:h-80 lg:h-96"
         />
       </motion.div>
     </section>

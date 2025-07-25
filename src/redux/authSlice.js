@@ -1,8 +1,9 @@
+// src/redux/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const API_BASE = "https://your-backend.com/api/auth"; // replace with your real API
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
 
-// Thunks
+// 🔐 Thunks: Login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
@@ -21,6 +22,7 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// 🧾 Thunks: Register
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ name, email, password }, { rejectWithValue }) => {
@@ -39,11 +41,12 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Load from storage
+// 📦 Load from storage
 const userFromStorage = localStorage.getItem("user")
   ? JSON.parse(localStorage.getItem("user"))
   : null;
-const tokenFromStorage = localStorage.getItem("token") || null;
+
+const tokenFromStorage = userFromStorage?.token || null;
 
 const initialState = {
   user: userFromStorage,
@@ -60,39 +63,52 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       localStorage.removeItem("user");
-      localStorage.removeItem("token");
+      localStorage.removeItem("token"); // ✅ needed for auto logout
     },
   },
   extraReducers: (builder) => {
     builder
-      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = { ...action.payload.user, token: action.payload.token };
         state.token = action.payload.token;
-        localStorage.setItem("user", JSON.stringify(action.payload.user));
-        localStorage.setItem("token", action.payload.token);
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...action.payload.user,
+            token: action.payload.token,
+          })
+        );
+        localStorage.setItem("token", action.payload.token); // ✅ needed
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Login failed";
       })
 
-      // Register
+      // 🆕 Register flow
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = { ...action.payload.user, token: action.payload.token };
         state.token = action.payload.token;
-        localStorage.setItem("user", JSON.stringify(action.payload.user));
-        localStorage.setItem("token", action.payload.token);
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...action.payload.user,
+            token: action.payload.token,
+          })
+        );
+        localStorage.setItem("token", action.payload.token); // ✅ needed
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;

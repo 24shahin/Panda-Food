@@ -3,8 +3,14 @@ import { Heart, ShoppingCart } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 import toast from "react-hot-toast";
+import { CiMenuKebab } from "react-icons/ci";
 
-export default function MenuItemCard({ item, restaurantId, restaurantName }) {
+export default function MenuItemCard({
+  item,
+  restaurantId,
+  restaurantName,
+  handleClick,
+}) {
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {
@@ -52,6 +58,11 @@ export default function MenuItemCard({ item, restaurantId, restaurantName }) {
           alt={item.name}
           className="w-full h-full object-cover"
         />
+      </div>
+      <div
+        className="text-white cursor-pointer ml-3 bg-secondary px-3 py-2 rounded-md hover:bg-secondary/50 flex items-center justify-end"
+        onClick={() => handleClick(item)}>
+        <CiMenuKebab className="inline-block" />
       </div>
     </div>
   );
