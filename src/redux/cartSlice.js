@@ -1,36 +1,42 @@
+// src/redux/cartSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
-// Helper functions for localStorage
-const loadState = () => {
+// Keyed by userId
+const loadCartState = (userId) => {
   try {
-    const serializedState = localStorage.getItem("cartState");
-    if (serializedState === null) return undefined;
-    return JSON.parse(serializedState);
+    // userId null হলে খালি কার্ট স্টেট রিটার্ন করবে
+    if (!userId) return { items: [], selectedIds: [] };
+    const data = localStorage.getItem(`cartState_${userId}`);
+    return data ? JSON.parse(data) : { items: [], selectedIds: [] };
   } catch {
-    return undefined;
+    return { items: [], selectedIds: [] };
   }
 };
 
-const saveState = (state) => {
+const saveCartState = (userId, state) => {
   try {
-    const serializedState = JSON.stringify(state);
-    localStorage.setItem("cartState", serializedState);
-  } catch {
-    // Ignore write errors
-  }
+    // userId না থাকলে সেভ করা হবে না
+    if (userId) {
+      localStorage.setItem(`cartState_${userId}`, JSON.stringify(state));
+    }
+  } catch {}
 };
-
-const persistedState = loadState();
 
 const cartSlice = createSlice({
   name: "cart",
-  initialState: persistedState || {
-    items: [],
-    selectedIds: [],
-  },
+  initialState: { items: [], selectedIds: [], userId: null },
   reducers: {
+    initCartFromLocalStorage: (state, action) => {
+      const userId = action.payload;
+      const persisted = loadCartState(userId);
+      state.items = persisted.items || [];
+      state.selectedIds = persisted.selectedIds || [];
+      state.userId = userId;
+      console.log("Restoring cart for user:", userId, loadCartState(userId));
+    },
+
     addToCart: (state, action) => {
-      const { _id, restaurantId } = action.payload;
+      const { _id, restaurantId } = action.payload; // ✅ userId পেলোড থেকে সরানো হয়েছে
       const existing = state.items.find((i) => i._id === _id);
 
       if (existing) {
@@ -39,11 +45,12 @@ const cartSlice = createSlice({
         state.items.push({
           ...action.payload,
           quantity: 1,
-          restaurantId: restaurantId || null, // default fallback if missing
+          restaurantId: restaurantId || null,
         });
       }
 
-      saveState(state);
+      // ✅ state.userId ব্যবহার করে ডেটা সেভ করা হয়েছে
+      saveCartState(state.userId, state);
     },
 
     removeFromCart: (state, action) => {
@@ -51,13 +58,15 @@ const cartSlice = createSlice({
       state.selectedIds = state.selectedIds.filter(
         (id) => id !== action.payload
       );
-      saveState(state);
+      // ✅ state.userId ব্যবহার করে ডেটা সেভ করা হয়েছে
+      saveCartState(state.userId, state);
     },
 
     updateQuantity: (state, action) => {
       const item = state.items.find((i) => i._id === action.payload.id);
       if (item) item.quantity = action.payload.quantity;
-      saveState(state);
+      // ✅ state.userId ব্যবহার করে ডেটা সেভ করা হয়েছে
+      saveCartState(state.userId, state);
     },
 
     toggleSelectItem: (state, action) => {
@@ -67,23 +76,33 @@ const cartSlice = createSlice({
       } else {
         state.selectedIds.push(id);
       }
-      saveState(state);
+      // ✅ state.userId ব্যবহার করে ডেটা সেভ করা হয়েছে
+      saveCartState(state.userId, state);
     },
 
     selectAll: (state, action) => {
       state.selectedIds = action.payload;
-      saveState(state);
+      // ✅ state.userId ব্যবহার করে ডেটা সেভ করা হয়েছে
+      saveCartState(state.userId, state);
     },
 
     clearSelected: (state) => {
       state.selectedIds = [];
-      saveState(state);
+      // ✅ state.userId ব্যবহার করে ডেটা সেভ করা হয়েছে
+      saveCartState(state.userId, state);
     },
 
     clearCart: (state) => {
       state.items = [];
       state.selectedIds = [];
-      saveState(state);
+      // ✅ state.userId ব্যবহার করে ডেটা সেভ করা হয়েছে
+      saveCartState(state.userId, state);
+    },
+
+    logoutCart: (state) => {
+      state.items = [];
+      state.selectedIds = [];
+      state.userId = null;
     },
   },
 });
@@ -96,6 +115,8 @@ export const {
   selectAll,
   clearSelected,
   clearCart,
+  logoutCart,
+  initCartFromLocalStorage,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

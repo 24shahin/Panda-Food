@@ -1,19 +1,27 @@
-import React, { useState } from "react";
-import { useUploadImagesMutation } from "../../redux/apiSlice";
+// MenuItemForm.js
+import React, { useEffect, useRef, useState } from "react";
+import {
+  useAddMenuItemMutation,
+  useEditMenuItemMutation,
+  useUploadImagesMutation,
+} from "../../redux/apiSlice";
 import dataURLtoBlob from "../../functions/imagesConvertor";
-import { useSelector } from "react-redux";
-import { Watch } from "react-loader-spinner";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { RxCross1 } from "react-icons/rx";
+import { useNavigate } from "react-router-dom";
+import { Watch } from "react-loader-spinner";
 
 export default function MenuItemForm({
-  onSubmit,
   initial = {},
   setShowForm,
   setEditItem,
+  editItem,
+  onItemUpdated = () => {},
 }) {
   const userInfo = useSelector((state) => state.auth.user);
   const [imageError, setImageError] = useState("");
-  const [menuImage, setMenuImage] = useState();
+  const [menuImage, setMenuImage] = useState("");
   const [form, setForm] = useState({
     name: initial.name || "",
     description: initial.description || "",
@@ -22,20 +30,32 @@ export default function MenuItemForm({
     category: initial.category || "",
     available: initial.available ?? true,
   });
+  const path = `${userInfo._id}/menu_images/${initial._id}`;
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+  const [addMenuItem, { isLoading }] = useAddMenuItemMutation();
+  const [editMenuItem] = useEditMenuItemMutation();
+  const [uploadImages] = useUploadImagesMutation();
 
-  const [uploadImages, { isLoading }] = useUploadImagesMutation();
+  useEffect(() => {
+    if (initial.image) {
+      setMenuImage(initial.image);
+    }
+  }, [initial.image]);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
 
     if (type === "file") {
       const file = files[0];
-      if (
-        file.type !== "image/webp" &&
-        file.type !== "image/jpeg" &&
-        file.type !== "image/png" &&
-        file.type !== "image/gif"
-      ) {
+      const allowedTypes = [
+        "image/webp",
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
         setImageError("Only JPG, PNG, WEBP, or GIF images are allowed.");
         return;
       }
@@ -65,35 +85,91 @@ export default function MenuItemForm({
       return alert("Name and Price are required.");
     }
 
-    if (!form.image || !(form.image instanceof File)) {
-      return alert("Please select a valid image file.");
-    }
-
     try {
-      const blob = dataURLtoBlob(menuImage);
-      const path = `${userInfo._id}/menu_images`;
+      const added = await addMenuItem(form).unwrap();
 
-      const formData = new FormData();
-      formData.append("file", blob);
-      formData.append("path", path);
+      if (form.image && form.image instanceof File) {
+        const blob = await dataURLtoBlob(menuImage);
+        const path = `${userInfo._id}/menu_images/${added._id}`;
+        const formData = new FormData();
+        formData.append("file", blob);
+        formData.append("path", path);
 
-      const uploaded = await uploadImages({ formData, path }).unwrap();
+        const uploaded = await uploadImages({ formData, path }).unwrap();
 
-      const finalData = {
-        ...form,
-        image: uploaded[0].url,
-      };
+        await editMenuItem({
+          id: added._id,
+          data: { image: uploaded[0].url },
+          addedImage: true,
+        }).unwrap();
+      }
 
-      onSubmit(finalData);
+      toast.success("Menu item added successfully");
+      setTimeout(() => navigate(`/restaurant/${userInfo._id}`), 2000);
     } catch (err) {
-      console.error("Image upload failed:", err);
-      toast.error(`${err?.data?.message}`);
+      console.error("Error:", err);
+      toast.error(`${err.message}`);
     }
   };
 
+  const handleEditUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!form.name || !form.price) {
+      return alert("Name and Price are required.");
+    }
+
+    try {
+      if (form.image && form.image instanceof File) {
+        const blob = await dataURLtoBlob(menuImage);
+        const formData = new FormData();
+        formData.append("file", blob);
+        formData.append("path", path);
+
+        const uploaded = await uploadImages({ formData, path }).unwrap();
+
+        await editMenuItem({
+          id: initial._id,
+          data: { ...form, image: uploaded[0].url },
+          addedImage: true,
+          path,
+        }).unwrap();
+      } else {
+        const { image, ...restForm } = form;
+        const updatedForm = {
+          ...restForm,
+          image: menuImage || initial.image,
+        };
+
+        await editMenuItem({
+          id: initial._id,
+          data: updatedForm,
+          addedImage: false,
+          path,
+        }).unwrap();
+      }
+
+      toast.success("Menu item updated successfully");
+      setEditItem(null);
+      onItemUpdated();
+      setShowForm(false);
+    } catch (err) {
+      toast.error(`Update failed. ${err}`);
+      console.error("Update error:", err);
+    }
+  };
+
+  const handleImageClear = async () => {
+    setMenuImage("");
+    setForm((prev) => ({ ...prev, image: null }));
+    const deleteImage = await deleteImagesFolder({ path }).unwrap();
+    console.log(deleteImage);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
-      {/* Name */}
+    <form
+      onSubmit={editItem ? handleEditUpdate : handleSubmit}
+      className="space-y-4 max-w-md mx-auto">
       <input
         type="text"
         name="name"
@@ -104,17 +180,15 @@ export default function MenuItemForm({
         className="w-full border p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
       />
 
-      {/* Description */}
       <textarea
         name="description"
         placeholder="Description"
         value={form.description}
         onChange={handleChange}
         rows={2}
-        className="w-full border p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+        className="w-full border p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white resize-none"
       />
 
-      {/* Price */}
       <input
         type="text"
         name="price"
@@ -125,7 +199,6 @@ export default function MenuItemForm({
         className="w-full border p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
       />
 
-      {/* Category */}
       <input
         type="text"
         name="category"
@@ -135,29 +208,37 @@ export default function MenuItemForm({
         className="w-full border p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
       />
 
-      <div className={`${initial.name ? "hidden" : "block"}`}>
-        {/* Image Upload */}
+      <div>
         <input
           type="file"
           name="image"
           accept="image/*"
           onChange={handleChange}
-          className="w-full border p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+          className="w-full border cursor-pointer p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
         />
 
         {imageError && <p className="text-red-500 text-sm">{imageError}</p>}
+
         {menuImage && (
-          <div>
+          <div className="relative">
             <img
               src={menuImage}
               alt="Preview"
-              className="w-32 h-32 object-cover rounded"
+              className="w-28 h-28 object-cover rounded mt-3"
             />
+            {editItem && (
+              <div className="absolute top-0 left-0 w-28">
+                <div
+                  className="bg-white/70 inline-block p-1 rounded cursor-pointer ml-1 mt-1"
+                  onClick={handleImageClear}>
+                  <RxCross1 />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Available */}
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -168,7 +249,6 @@ export default function MenuItemForm({
         Available
       </label>
 
-      {/* Submit */}
       <div className="flex gap-3">
         <button
           type="submit"
@@ -183,24 +263,22 @@ export default function MenuItemForm({
                 radius="48"
                 color="#0ee3bc"
                 ariaLabel="watch-loading"
-                wrapperStyle={{}}
-                wrapperClass=""
               />
             </div>
-          ) : initial.name ? (
+          ) : editItem ? (
             "Update Item"
           ) : (
             "Add Item"
           )}
         </button>
-        {initial.name && (
+        {editItem && (
           <button
-            className="px-4 py-2 text-white bg-red-400 cursor-pointer rounded"
+            className="px-4 py-2 text-white bg-red-600 cursor-pointer rounded"
             onClick={() => {
               setEditItem("");
               setShowForm(false);
             }}>
-            Cancle
+            Cancel
           </button>
         )}
       </div>

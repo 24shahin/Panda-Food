@@ -11,7 +11,7 @@ export default function Checkout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items, selectedIds } = useSelector((state) => state.cart);
-  const address = useSelector((state) => state.orders.deliveryAddress);
+  const address = useSelector((state) => state?.orders?.deliveryAddress);
 
   useEffect(() => {
     if (!address || address == null) {

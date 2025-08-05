@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
@@ -24,6 +25,9 @@ import Dashboard from "./pages/restaurant/Dashboard";
 import { useGetAllRestaurantQuery } from "./redux/apiSlice";
 import NewMenuAdd from "./components/Restaurant/NewMenuAdd";
 
+import { useSelector, useDispatch } from "react-redux";
+import { initCartFromLocalStorage, logoutCart } from "./redux/cartSlice"; // ✅ logoutCart import করা হয়েছে
+
 export default function App() {
   return (
     <Router>
@@ -37,9 +41,23 @@ function AppContent() {
   const [getAllRestaurant, setGetAllRestaurant] = useState([]);
   const { data: allRestaurant, isLoading } = useGetAllRestaurantQuery();
 
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (allRestaurant) setGetAllRestaurant(allRestaurant);
   }, [allRestaurant]);
+
+  useEffect(() => {
+    if (user && user._id) {
+      // ব্যবহারকারী লগইন করলে তার আইডি ব্যবহার করে কার্ট লোড করা হবে
+      dispatch(initCartFromLocalStorage(user._id));
+    } else {
+      // ব্যবহারকারী লগআউট করলে কার্ট স্টেট ক্লিয়ার করা হবে
+      // ✅ initCartFromLocalStorage(null) এর বদলে logoutCart ব্যবহার করা হয়েছে
+      dispatch(logoutCart());
+    }
+  }, [user, dispatch]);
 
   return (
     <>
@@ -48,6 +66,7 @@ function AppContent() {
         <Header />
         <main className="flex-1">
           <Routes>
+            {/* your routes here unchanged */}
             <Route
               path="/"
               element={

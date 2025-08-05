@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/authSlice"; // Thunk
+import { initCartFromLocalStorage } from "../redux/cartSlice"; // ✅ Correct import
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -26,6 +27,9 @@ export default function Login() {
       if (!role || !id) {
         return toast.error("Login error: Missing user info.");
       }
+
+      // ✅ Load user-specific cart from localStorage
+      dispatch(initCartFromLocalStorage(id));
 
       // ✅ Role-based navigation
       if (role === "admin") {

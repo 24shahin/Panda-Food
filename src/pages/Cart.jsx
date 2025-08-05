@@ -97,7 +97,7 @@ export default function Cart() {
                       type="checkbox"
                       checked={selectedIds.includes(item._id)}
                       onChange={() => handleCheckboxToggle(item._id)}
-                      className="w-5 h-5 accent-secondary"
+                      className="w-5 h-5 accent-secondary cursor-pointer"
                     />
                     <img
                       src={item.image}
@@ -114,13 +114,13 @@ export default function Cart() {
                       <div className="flex items-center space-x-2 w-1/4">
                         <button
                           onClick={() => handleQuantityChange(item, -1)}
-                          className="px-2 py-1 bg-gray-200 rounded">
+                          className="px-2 py-1 bg-gray-200 rounded cursor-pointer">
                           -
                         </button>
                         <span>{item.quantity}</span>
                         <button
                           onClick={() => handleQuantityChange(item, 1)}
-                          className="px-2 py-1 bg-gray-200 rounded">
+                          className="px-2 py-1 bg-gray-200 rounded cursor-pointer">
                           +
                         </button>
                       </div>
@@ -130,7 +130,7 @@ export default function Cart() {
                     </div>
                     <button
                       onClick={() => handleRemove(item._id)}
-                      className="text-red-500 hover:underline text-sm">
+                      className="text-red-500 hover:underline text-sm cursor-pointer">
                       Remove
                     </button>
                   </div>

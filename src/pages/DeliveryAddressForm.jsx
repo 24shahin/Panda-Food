@@ -1,28 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setDeliveryAddress } from "../redux/ordersSlice";
 import toast from "react-hot-toast";
+import { useUserdeliveryaddressMutation } from "../redux/apiSlice";
 
-const AddressForm = ({ onSave, initialAddress = {} }) => {
+const AddressForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [userdeliveryaddress] = useUserdeliveryaddressMutation();
 
   const [address, setAddress] = useState({
-    street: initialAddress.street || "",
-    city: initialAddress.city || "",
-    state: initialAddress.state || "",
-    zipCode: initialAddress.zipCode || "",
-    mobileNumber: initialAddress.mobileNumber || "",
-    apartment: initialAddress.apartment || "",
-    deliveryInstructions: initialAddress.deliveryInstructions || "",
+    street: "",
+    apartment: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    mobileNumber: "",
+    deliveryInstructions: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
+
+  // 🧠 Fetch saved address on mount
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        // const { data } = await axios.get("/api/address", {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+        // setAddress(data);
+        // dispatch(setDeliveryAddress(data)); // Store in Redux too
+      } catch (err) {
+        console.log("No saved address found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAddress();
+  }, [dispatch, token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAddress((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -40,26 +63,40 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
+    if (!validate()) {
+      toast.error("Address couldn't save. Some error happened");
+      return;
+    }
+
+    try {
+      const sendaddress = await userdeliveryaddress({ data: address });
+      console.log(sendaddress);
+
+      toast.success("Address saved successfully");
+
       dispatch(setDeliveryAddress(address));
-      toast.success("Address success save");
+
       setTimeout(() => {
         navigate("/checkout");
       }, 1500);
-    } else {
-      toast.error(`Address couldn't save. Some error happened`);
+    } catch (error) {
+      console.error("Address Save Error:", error);
+      toast.error("Failed to save address");
     }
   };
 
+  if (loading) return <p className="text-center py-8">Loading address...</p>;
+
   return (
-    <div className="max-w-md mx-auto p-6  dark:bg-backgroundDarkHover rounded-lg shadow-md">
+    <div className="max-w-md mx-auto p-6 dark:bg-backgroundDarkHover rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center dark:text-white">
         Delivery Address
       </h2>
       <form onSubmit={handleSubmit}>
-        <div className="mb-4 ">
+        {/* Street */}
+        <div className="mb-4">
           <label
             className="block text-gray-700 mb-2 dark:text-white"
             htmlFor="street">
@@ -81,6 +118,7 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
           )}
         </div>
 
+        {/* Apartment */}
         <div className="mb-4">
           <label
             className="block text-gray-700 mb-2 dark:text-white"
@@ -98,6 +136,7 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
           />
         </div>
 
+        {/* City & State */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label
@@ -111,9 +150,9 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
               name="city"
               value={address.city}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border dark:text-white placeholder-[#9e9c9c] dark:placeholder-gray-400 ${
+              className={`w-full px-3 py-2 border dark:text-white ${
                 errors.city ? "border-red-500" : "border-gray-300"
-              } rounded-md`}
+              } rounded-md placeholder-[#9e9c9c] dark:placeholder-gray-400`}
               placeholder="New York"
             />
             {errors.city && (
@@ -122,7 +161,9 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-2" htmlFor="state">
+            <label
+              className="block text-gray-700 mb-2 dark:text-white"
+              htmlFor="state">
               State*
             </label>
             <input
@@ -131,9 +172,9 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
               name="state"
               value={address.state}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border dark:text-white placeholder-[#9e9c9c] dark:placeholder-gray-400 ${
+              className={`w-full px-3 py-2 border dark:text-white ${
                 errors.state ? "border-red-500" : "border-gray-300"
-              } rounded-md`}
+              } rounded-md placeholder-[#9e9c9c] dark:placeholder-gray-400`}
               placeholder="NY"
             />
             {errors.state && (
@@ -142,6 +183,7 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
           </div>
         </div>
 
+        {/* ZIP */}
         <div className="mb-4">
           <label
             className="block text-gray-700 mb-2 dark:text-white"
@@ -154,30 +196,32 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
             name="zipCode"
             value={address.zipCode}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border dark:text-white placeholder-[#9e9c9c] dark:placeholder-gray-400 ${
+            className={`w-full px-3 py-2 border dark:text-white ${
               errors.zipCode ? "border-red-500" : "border-gray-300"
-            } rounded-md`}
+            } rounded-md placeholder-[#9e9c9c] dark:placeholder-gray-400`}
             placeholder="10001"
           />
           {errors.zipCode && (
             <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>
           )}
         </div>
+
+        {/* Mobile */}
         <div className="mb-4">
           <label
             className="block text-gray-700 mb-2 dark:text-white"
-            htmlFor="MobileNumber">
+            htmlFor="mobileNumber">
             Mobile Number*
           </label>
           <input
             type="text"
-            id="MobileNmber"
+            id="mobileNumber"
             name="mobileNumber"
             value={address.mobileNumber}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border dark:text-white placeholder-[#9e9c9c] dark:placeholder-gray-400 ${
+            className={`w-full px-3 py-2 border dark:text-white ${
               errors.mobileNumber ? "border-red-500" : "border-gray-300"
-            } rounded-md`}
+            } rounded-md placeholder-[#9e9c9c] dark:placeholder-gray-400`}
             placeholder="Mobile Number"
           />
           {errors.mobileNumber && (
@@ -185,6 +229,7 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
           )}
         </div>
 
+        {/* Instructions */}
         <div className="mb-6">
           <label
             className="block text-gray-700 mb-2 dark:text-white"
@@ -202,6 +247,7 @@ const AddressForm = ({ onSave, initialAddress = {} }) => {
           />
         </div>
 
+        {/* Buttons */}
         <div className="flex justify-between">
           <button
             type="button"

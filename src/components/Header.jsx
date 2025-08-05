@@ -1,10 +1,11 @@
+// src/components/Header.jsx
 import React, { useEffect, useState } from "react";
 import { Search, User, ShoppingCart, Sun, Moon, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
+import { logoutCart } from "../redux/cartSlice"; // ✅ logoutCart action import করা হয়েছে
 
 export default function Header() {
   const [darkMode, setDarkMode] = useState(
@@ -12,6 +13,7 @@ export default function Header() {
   );
 
   const user = useSelector((state) => state.auth.user);
+  const CartItemLength = useSelector((state) => state?.cart?.items.length);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -26,9 +28,14 @@ export default function Header() {
     }
   }, [darkMode]);
 
-  // Logout handler
+  // ✅ Logout handler আপডেট করা হয়েছে
   const handleLogout = () => {
+    // Redux auth state থেকে ইউজারকে লগআউট করা হয়েছে
     dispatch(logout());
+
+    // ✅ Redux cart state থেকে কার্ট ক্লিয়ার করা হয়েছে
+    dispatch(logoutCart());
+
     navigate("/login");
   };
 
@@ -107,7 +114,7 @@ export default function Header() {
             title="Cart">
             <ShoppingCart className="h-6 w-6" />
             <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-bold rounded-full px-1">
-              3
+              {CartItemLength ? CartItemLength : ""}
             </span>
           </Link>
 

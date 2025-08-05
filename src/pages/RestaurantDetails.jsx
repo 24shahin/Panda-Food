@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import MenuItemCard from "../components/MenuItemCard";
 import { MapPin, Star, MessageSquare } from "lucide-react";
 import OutSideClick from "../functions/click";
 import { useNavigate, useParams } from "react-router-dom";
@@ -44,13 +43,15 @@ export default function RestaurantDetails() {
   const isVisitor = !!id;
   const isOwner = userInfo?.user?.role === "restaurant" && !id;
 
-  const { data: selectedRestaurant } = useSelectedRestaurantQuery(id, {
-    skip: !isVisitor,
-  });
-  const { data: myRestaurantDetails, isLoading } = useMyRestaurantQuery(
-    undefined,
-    { skip: !isOwner }
-  );
+  const { data: selectedRestaurant, refetch: refetchSelectedRestaurant } =
+    useSelectedRestaurantQuery(id, {
+      skip: !isVisitor,
+    });
+  const {
+    data: myRestaurantDetails,
+    isLoading,
+    refetch: refetchMyRestaurantDetails,
+  } = useMyRestaurantQuery(undefined, { skip: !isOwner });
 
   const [restaurants, setRestaurants] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -92,17 +93,9 @@ export default function RestaurantDetails() {
       </h1>
     );
   }
-
   const userId = id === undefined ? userInfo?.user?._id : id;
-  const visitor = userInfo?.user?._id === restaurants?.user;
 
-  if (isLoading || !restaurants) {
-    return (
-      <h1 className="text-2xl text-primary font-extrabold w-full h-screen flex items-center justify-center">
-        Loading . . .
-      </h1>
-    );
-  }
+  const visitor = userInfo?.user?._id === restaurants?.user;
 
   return (
     <div className="bg-backgroundLight dark:bg-backgroundDark text-black dark:text-white min-h-screen">
@@ -223,30 +216,34 @@ export default function RestaurantDetails() {
       {/* Menu List */}
       <div className="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 gap-4">
         {restaurants?.restaurantMenuItem &&
-          (restaurants?.restaurantMenuItem.length > 0 ? (
-            restaurants?.restaurantMenuItem
-              .slice()
-              .sort((a, b) => {
-                return new Date(b.createdAt) - new Date(a.createdAt);
-              })
-              .map((item, index) => (
-                <motion.div
-                  key={item._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}>
-                  <AddMenu
-                    item={item}
-                    visitor={visitor}
-                    restaurantName={restaurants.name}
-                  />
-                </motion.div>
-              ))
-          ) : (
-            <span>You need to add menu item for your restaurant</span>
-          ))}
-        <h3>Add Restaurant Items and see </h3>
+        restaurants?.restaurantMenuItem.length > 0 ? (
+          restaurants.restaurantMenuItem
+            .slice()
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map((item, index) => (
+              <motion.div
+                key={item._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}>
+                <AddMenu
+                  item={item}
+                  visitor={visitor}
+                  restaurantName={restaurants.name}
+                  onItemUpdated={() => {
+                    if (isOwner) {
+                      refetchMyRestaurantDetails();
+                    } else if (isVisitor) {
+                      refetchSelectedRestaurant();
+                    }
+                  }}
+                />
+              </motion.div>
+            ))
+        ) : (
+          <span>You need to add menu item for your restaurant</span>
+        )}
       </div>
       {/* comment Box */}
       {commentBoxShow && (

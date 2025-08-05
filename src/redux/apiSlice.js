@@ -34,6 +34,13 @@ export const apiSlice = createApi({
         body: formData,
       }),
     }),
+    deleteImagesFolder: builder.mutation({
+      query: ({ path }) => ({
+        url: "/api/upload/imagesdelete",
+        method: "POST",
+        body: { path },
+      }),
+    }),
     registerRestaurant: builder.mutation({
       query: ({ name, location, contactNumber, email, images }) => ({
         url: "/api/restaurants/registerrestaurant",
@@ -57,6 +64,29 @@ export const apiSlice = createApi({
         body: { name, description, price, image, category, available },
       }),
     }),
+    editMenuItem: builder.mutation({
+      query: ({ id, data, addedImage, path }) => ({
+        url: `/api/menu-items/menuoption/${id}`,
+        method: "PUT",
+        body: { data, addedImage, path },
+      }),
+    }),
+    deleteMenuItem: builder.mutation({
+      query: ({ id }) => ({
+        url: `/api/menu-items/menudelete/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    userdeliveryaddress: builder.mutation({
+      query: ({ data }) => ({
+        url: `/api/address/send`,
+        method: "POST",
+        body: { data },
+      }),
+    }),
+    getuserdeliveryaddress: builder.query({
+      query: () => `/api/address/send`,
+    }),
   }),
 });
 
@@ -69,4 +99,9 @@ export const {
   useGetAllRestaurantQuery,
   useAddMenuItemMutation,
   useSelectedRestaurantQuery,
+  useEditMenuItemMutation,
+  useDeleteImagesFolderMutation,
+  useDeleteMenuItemMutation,
+  useUserdeliveryaddressMutation,
+  useGetuserdeliveryaddressQuery,
 } = apiSlice;
