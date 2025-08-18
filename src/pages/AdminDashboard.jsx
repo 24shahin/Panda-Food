@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { User, PackageCheck, DollarSign } from "lucide-react";

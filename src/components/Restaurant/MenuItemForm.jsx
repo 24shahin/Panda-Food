@@ -108,7 +108,7 @@ export default function MenuItemForm({
       setTimeout(() => navigate(`/restaurant/${userInfo._id}`), 2000);
     } catch (err) {
       console.error("Error:", err);
-      toast.error(`${err.message}`);
+      toast.error(`${err?.data?.message}`);
     }
   };
 
@@ -131,7 +131,7 @@ export default function MenuItemForm({
         await editMenuItem({
           id: initial._id,
           data: { ...form, image: uploaded[0].url },
-          addedImage: true,
+          addedImage: false,
           path,
         }).unwrap();
       } else {

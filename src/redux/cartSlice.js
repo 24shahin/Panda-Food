@@ -32,7 +32,6 @@ const cartSlice = createSlice({
       state.items = persisted.items || [];
       state.selectedIds = persisted.selectedIds || [];
       state.userId = userId;
-      console.log("Restoring cart for user:", userId, loadCartState(userId));
     },
 
     addToCart: (state, action) => {

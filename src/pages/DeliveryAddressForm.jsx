@@ -72,7 +72,6 @@ const AddressForm = () => {
 
     try {
       const sendaddress = await userdeliveryaddress({ data: address });
-      console.log(sendaddress);
 
       toast.success("Address saved successfully");
 

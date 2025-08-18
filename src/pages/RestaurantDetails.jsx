@@ -133,9 +133,16 @@ export default function RestaurantDetails() {
                       Restaurant Details and add somethings
                     </h3>
                     <button
-                      className="text-white cursor-pointer bg-secondary/30 px-3 py-1 rounded-md hover:bg-secondary/50 flex items-center justify-end"
+                      className="text-white cursor-pointer bg-secondary/30 px-3 py-1 rounded hover:bg-secondary/50 flex items-center justify-end"
                       onClick={() => navigate("/restaurantOwner/addmenu")}>
                       Add a Menu item
+                    </button>
+                    <button
+                      className="text-white cursor-pointer bg-secondary/30 px-3 py-1 rounded hover:bg-secondary/50 flex items-center justify-end mt-3"
+                      onClick={() =>
+                        navigate("/restaurant/dashboard/overview")
+                      }>
+                      Go to Dashboard
                     </button>
                   </div>
                 )}
@@ -230,6 +237,7 @@ export default function RestaurantDetails() {
                 <AddMenu
                   item={item}
                   visitor={visitor}
+                  restaurantId={restaurants?.user}
                   restaurantName={restaurants.name}
                   onItemUpdated={() => {
                     if (isOwner) {

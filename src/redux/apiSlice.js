@@ -85,7 +85,44 @@ export const apiSlice = createApi({
       }),
     }),
     getuserdeliveryaddress: builder.query({
-      query: () => `/api/address/send`,
+      query: () => `/api/address/get`,
+    }),
+    userOrder: builder.mutation({
+      query: ({
+        items,
+        restaurant,
+        deliveryFee,
+        subtotal,
+        total,
+        address,
+      }) => ({
+        url: `/api/orders`,
+        method: "POST",
+        body: { items, restaurant, deliveryFee, subtotal, total, address },
+      }),
+    }),
+    getUserOrders: builder.query({
+      query: () => `/api/orders/get`,
+    }),
+    getSelectedOrders: builder.query({
+      query: ({ id }) => `/api/orders/get/${id}`,
+    }),
+
+    OrderStatus: builder.mutation({
+      query: ({ orderId, newStatus }) => ({
+        url: `/api/orders/status`,
+        method: "PUT",
+        body: { orderId, newStatus },
+      }),
+    }),
+    restaurantOverView: builder.query({
+      query: (purpuse) => `/api/restaurantowner/dashboard/${purpuse}`,
+    }),
+    deleteOrderItem: builder.mutation({
+      query: ({ id }) => ({
+        url: `/api/restaurantowner/dashboard/orders/${id}`,
+        method: "DELETE",
+      }),
     }),
   }),
 });
@@ -104,4 +141,10 @@ export const {
   useDeleteMenuItemMutation,
   useUserdeliveryaddressMutation,
   useGetuserdeliveryaddressQuery,
+  useUserOrderMutation,
+  useGetUserOrdersQuery,
+  useGetSelectedOrdersQuery,
+  useOrderStatusMutation,
+  useRestaurantOverViewQuery,
+  useDeleteOrderItemMutation,
 } = apiSlice;

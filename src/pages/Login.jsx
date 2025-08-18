@@ -5,6 +5,7 @@ import { initCartFromLocalStorage } from "../redux/cartSlice"; // ✅ Correct im
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { initOrdersFromLocalStorage } from "../redux/ordersSlice";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -30,14 +31,15 @@ export default function Login() {
 
       // ✅ Load user-specific cart from localStorage
       dispatch(initCartFromLocalStorage(id));
+      dispatch(initOrdersFromLocalStorage(id));
 
       // ✅ Role-based navigation
       if (role === "admin") {
         navigate("/admin/orders");
       } else if (role === "restaurant") {
-        navigate(`/restaurant/${id}`);
+        navigate(`/restaurant/dashboard/overview`);
       } else {
-        navigate("/orders");
+        navigate("/cart");
       }
     } catch (err) {
       toast.error(err || "Login failed");

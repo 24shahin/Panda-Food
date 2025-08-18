@@ -46,7 +46,7 @@ export default function MenuItem({
       {/* FORM SECTION (Admin only) */}
       {showForm && (
         <div
-          className="mb-6 absolute left-0 -bottom-5 w-1/2 bg-gray-200 p-6 dark:bg-gray-600 rounded-md z-50"
+          className="mb-6 absolute right-96 -bottom-1/2 translate-y-1/2 w-1/2 bg-gray-200 p-6 dark:bg-gray-600 rounded-md z-50"
           ref={editRef}>
           <MenuItemForm
             initial={editItem || {}}
@@ -77,11 +77,14 @@ export default function MenuItem({
             <div className="mt-3 flex gap-2">
               <button
                 className="bg-primary text-white px-3 py-1 rounded text-xs hover:bg-primary/90 transition cursor-pointer"
+                disabled={!item.available}
                 onClick={handleAddToCart}>
                 <ShoppingCart size={14} className="inline-block mr-1" />
                 Add to Cart
               </button>
-              <button className="bg-secondary/10 text-secondary px-3 py-1 rounded text-xs hover:bg-secondary/20 transition cursor-pointer">
+              <button
+                className="bg-secondary/10 text-secondary px-3 py-1 rounded text-xs hover:bg-secondary/20 transition cursor-pointer"
+                disabled={item.available}>
                 <Heart size={14} className="inline-block mr-1" />
                 Wishlist
               </button>

@@ -87,7 +87,7 @@ export default function Header() {
               <button
                 onClick={handleLogout}
                 title="Logout"
-                className="hover:text-secondary transition p-1">
+                className="hover:text-secondary transition p-1 cursor-pointer">
                 <LogOut className="h-6 w-6" />
               </button>
             </div>
@@ -96,12 +96,12 @@ export default function Header() {
               {/* Show Login/Register links if NOT logged in */}
               <Link
                 to="/login"
-                className="hover:text-secondary transition font-medium">
+                className="hover:text-secondary transition font-medium cursor-pointer">
                 Login
               </Link>
               <Link
                 to="/register"
-                className="hover:text-secondary transition font-medium">
+                className="hover:text-secondary transition font-medium cursor-pointer">
                 Register
               </Link>
             </>
@@ -113,7 +113,7 @@ export default function Header() {
             to={"/cart"}
             title="Cart">
             <ShoppingCart className="h-6 w-6" />
-            <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-bold rounded-full px-1">
+            <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-bold rounded-full px-1 ">
               {CartItemLength ? CartItemLength : ""}
             </span>
           </Link>

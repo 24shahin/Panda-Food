@@ -18,15 +18,24 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import AuthRedirectRoute from "./components/AuthRedirectRoute";
 import useAutoLogout from "./hooks/useAutoLogout";
 import AdminDashboard from "./pages/AdminDashboard";
 import RestaurantSetupForm from "./pages/RestaurantSetupForm";
-import Dashboard from "./pages/restaurant/Dashboard";
 import { useGetAllRestaurantQuery } from "./redux/apiSlice";
 import NewMenuAdd from "./components/Restaurant/NewMenuAdd";
 
 import { useSelector, useDispatch } from "react-redux";
-import { initCartFromLocalStorage, logoutCart } from "./redux/cartSlice"; // ✅ logoutCart import করা হয়েছে
+import { initCartFromLocalStorage, logoutCart } from "./redux/cartSlice";
+import { initOrdersFromLocalStorage, logoutOrders } from "./redux/ordersSlice";
+import UserAllOrdes from "./pages/UserAllOrdes";
+import DashboardLayout from "./pages/restaurant/DashboardLayout";
+
+// ✅ Import restaurant dashboard pages
+import RestaurantOverview from "./pages/restaurant/RestaurantOverview";
+import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
+import RestaurantOrders from "./pages/restaurant/RestaurantOrders";
+import RestaurantSettings from "./pages/restaurant/RestaurantSettings";
 
 export default function App() {
   return (
@@ -50,12 +59,11 @@ function AppContent() {
 
   useEffect(() => {
     if (user && user._id) {
-      // ব্যবহারকারী লগইন করলে তার আইডি ব্যবহার করে কার্ট লোড করা হবে
       dispatch(initCartFromLocalStorage(user._id));
+      dispatch(initOrdersFromLocalStorage(user._id));
     } else {
-      // ব্যবহারকারী লগআউট করলে কার্ট স্টেট ক্লিয়ার করা হবে
-      // ✅ initCartFromLocalStorage(null) এর বদলে logoutCart ব্যবহার করা হয়েছে
       dispatch(logoutCart());
+      dispatch(logoutOrders());
     }
   }, [user, dispatch]);
 
@@ -66,7 +74,6 @@ function AppContent() {
         <Header />
         <main className="flex-1">
           <Routes>
-            {/* your routes here unchanged */}
             <Route
               path="/"
               element={
@@ -76,14 +83,39 @@ function AppContent() {
                 />
               }
             />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+
+            {/* ✅ NEW: Wrap login and register routes with AuthRedirectRoute */}
+            <Route
+              path="/login"
+              element={
+                <AuthRedirectRoute>
+                  <Login />
+                </AuthRedirectRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <AuthRedirectRoute>
+                  <Register />
+                </AuthRedirectRoute>
+              }
+            />
+
             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
             <Route
               path="/cart"
               element={
                 <ProtectedRoute>
                   <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/userallorders"
+              element={
+                <ProtectedRoute>
+                  <UserAllOrdes />
                 </ProtectedRoute>
               }
             />
@@ -143,14 +175,20 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            {/* ✅ Restaurant Owner Dashboard with nested routes */}
             <Route
-              path="/restaurantOwner/dashboard"
+              path="/restaurant/dashboard"
               element={
                 <ProtectedRoute restaurantOwner={true}>
-                  <Dashboard />
+                  <DashboardLayout />
                 </ProtectedRoute>
-              }
-            />
+              }>
+              <Route path="overview" element={<RestaurantOverview />} />
+              <Route path="menu" element={<RestaurantMenu />} />
+              <Route path="orders" element={<RestaurantOrders />} />
+              <Route path="settings" element={<RestaurantSettings />} />
+            </Route>
+
             <Route
               path="/restaurantOwner/addmenu"
               element={
