@@ -77,24 +77,25 @@ function UserAllOrders() {
                     className="flex justify-between items-center border-gray-400 border-b pb-2">
                     <div className="flex gap-3 items-center">
                       <img
-                        src={item.menuItem.image}
-                        alt={item.menuItem.name}
+                        src={item.menuItem?.image}
+                        alt={item.menuItem?.name}
                         className="w-12 h-12 object-cover rounded"
                       />
                       <div>
-                        <p className="font-medium">{item.name}</p>
+                        <p className="font-medium">{item?.name}</p>
                         <p className="text-xs text-gray-500">
-                          {order.restaurant?.name} • Qty: {item.quantity}
+                          {order?.restaurant?.name} • Qty: {item?.quantity}
                         </p>
                       </div>
                     </div>
                     <p className="text-sm font-semibold">
-                      Unite per price: ${Number(item.menuItem.price).toFixed(2)}
+                      Unite per price: $
+                      {Number(item?.menuItem?.price).toFixed(2)}
                     </p>
                     <p>
                       Subtotal: $
                       {(
-                        Number(item?.quantity) * Number(item.menuItem?.price)
+                        Number(item?.quantity) * Number(item?.menuItem?.price)
                       ).toFixed(2)}
                     </p>
                   </div>
@@ -108,11 +109,11 @@ function UserAllOrders() {
                   {order.deliveryFee === 0 ? (
                     <span className="text-green-600 font-medium">Free</span>
                   ) : (
-                    `$${Number(order.deliveryFee).toFixed(2)}`
+                    `$${Number(order?.deliveryFee).toFixed(2)}`
                   )}
                 </p>
                 <p className="text-lg font-bold text-black dark:text-white mt-1">
-                  Total: ${Number(order.totalPrice).toFixed(2)}
+                  Total: ${Number(order?.totalPrice).toFixed(2)}
                 </p>
               </div>
 

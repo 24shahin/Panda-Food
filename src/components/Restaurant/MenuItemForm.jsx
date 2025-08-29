@@ -31,7 +31,6 @@ export default function MenuItemForm({
     available: initial.available ?? true,
   });
   const path = `${userInfo._id}/menu_images/${initial._id}`;
-  const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const [addMenuItem, { isLoading }] = useAddMenuItemMutation();
   const [editMenuItem] = useEditMenuItemMutation();

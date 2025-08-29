@@ -1,4 +1,3 @@
-// src/redux/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL;
@@ -63,7 +62,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       localStorage.removeItem("user");
-      localStorage.removeItem("token"); // ✅ needed for auto logout
+      localStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
@@ -84,7 +83,7 @@ const authSlice = createSlice({
             token: action.payload.token,
           })
         );
-        localStorage.setItem("token", action.payload.token); // ✅ needed
+        localStorage.setItem("token", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -108,7 +107,7 @@ const authSlice = createSlice({
             token: action.payload.token,
           })
         );
-        localStorage.setItem("token", action.payload.token); // ✅ needed
+        localStorage.setItem("token", action.payload.token);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;

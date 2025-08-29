@@ -1,11 +1,15 @@
 // src/components/Header.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Search, User, ShoppingCart, Sun, Moon, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
 import { logoutCart } from "../redux/cartSlice"; // ✅ logoutCart action import করা হয়েছে
+import { logoutDeliveryManAuth } from "../redux/deliveryManSlice";
+import { logoutDeliveryMan } from "../redux/deliverymanOrderSlice";
+import SearchBox from "./SearchBox";
+import OutSideClick from "../functions/click";
 
 export default function Header() {
   const [darkMode, setDarkMode] = useState(
@@ -13,6 +17,9 @@ export default function Header() {
   );
 
   const user = useSelector((state) => state.auth.user);
+  const deliveryManInfo = useSelector(
+    (state) => state?.deliveryManAuth?.deliveryman
+  );
   const CartItemLength = useSelector((state) => state?.cart?.items.length);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -38,7 +45,20 @@ export default function Header() {
 
     navigate("/login");
   };
+  const handleDeliverymanLogout = () => {
+    // Redux auth state থেকে ইউজারকে লগআউট করা হয়েছে
+    dispatch(logoutDeliveryManAuth());
 
+    // ✅ Redux cart state থেকে কার্ট ক্লিয়ার করা হয়েছে
+    dispatch(logoutDeliveryMan());
+  };
+  // search functionality
+  const [showSearchBox, setShowSearchBox] = useState(false);
+  const searchRef = useRef(null);
+  OutSideClick(searchRef, () => setShowSearchBox(false));
+  const handleSearch = () => {
+    searchRef.current.focus();
+  };
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
@@ -55,13 +75,22 @@ export default function Header() {
 
         {/* Search Bar */}
         <div className="flex-1 mx-8 max-w-xl">
-          <div className="relative">
+          <div
+            className="relative w-full"
+            onClick={() => setShowSearchBox(true)}>
             <input
               type="text"
               placeholder="Search for dishes or restaurants..."
-              className="w-full py-2 pl-4 pr-10 rounded-full placeholder-[#d8cfcf] focus:outline-none border border-white text-white bg-transparent dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+              className="w-full py-2 pl-4 pr-10 rounded-md placeholder-[#d8cfcf] focus:outline-none border border-white text-white bg-transparent dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
             />
-            <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-300" />
+            <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-300 cursor-pointer" />
+            {showSearchBox && (
+              <div
+                ref={searchRef}
+                className="absolute top-0 left-0 w-full h-48 bg-white dark:bg-gray-700 rounded-md overflow-hidden">
+                <SearchBox />
+              </div>
+            )}
           </div>
         </div>
 
@@ -86,6 +115,19 @@ export default function Header() {
               {/* Logout button */}
               <button
                 onClick={handleLogout}
+                title="Logout"
+                className="hover:text-secondary transition p-1 cursor-pointer">
+                <LogOut className="h-6 w-6" />
+              </button>
+            </div>
+          ) : deliveryManInfo ? (
+            <div className="flex items-center space-x-2">
+              <span className="hidden sm:inline">
+                Hi, {deliveryManInfo.name}
+              </span>
+              {/* Logout button */}
+              <button
+                onClick={handleDeliverymanLogout}
                 title="Logout"
                 className="hover:text-secondary transition p-1 cursor-pointer">
                 <LogOut className="h-6 w-6" />

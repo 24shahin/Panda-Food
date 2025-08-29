@@ -23,7 +23,7 @@ export default function Orders() {
   const [loading, setLoading] = useState(false);
 
   const getRemainingTime = (createdAt) => {
-    const maxCancelMinutes = 10;
+    const maxCancelMinutes = 3;
     const diff = moment(createdAt)
       .add(maxCancelMinutes, "minutes")
       .diff(moment(), "seconds");
@@ -212,7 +212,7 @@ export default function Orders() {
                       </div>
                     ) : (
                       <p className="mt-4 text-sm text-red-500">
-                        You can't cancel your orders after 10 minute
+                        You can't cancel your orders after 3 minute
                       </p>
                     )}
                   </>

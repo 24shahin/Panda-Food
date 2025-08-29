@@ -5,8 +5,15 @@ export const apiSlice = createApi({
     baseUrl: import.meta.env.VITE_BACKEND_URL2,
     prepareHeaders: (headers) => {
       const user = JSON.parse(localStorage.getItem("user"));
+      const Deliveryman = JSON.parse(localStorage.getItem("deliverymanAuth"));
+
       if (user && user.token) {
         headers.set("Authorization", `Bearer ${user.token}`);
+      } else if (Deliveryman && Deliveryman?.deliveryman?.token) {
+        headers.set(
+          "Authorization",
+          `Bearer ${Deliveryman?.deliveryman?.token}`
+        );
       }
       return headers;
     },
@@ -26,10 +33,48 @@ export const apiSlice = createApi({
         body: userInfo,
       }),
     }),
+    DeliveryManRegister: builder.mutation({
+      query: ({
+        name,
+        email,
+        password,
+        phone,
+        image,
+        vehicleNumber,
+        drivingLicence,
+      }) => ({
+        url: "api/deliveryman/register",
+        method: "POST",
+        body: {
+          name,
+          email,
+          password,
+          phone,
+          image,
+          vehicleNumber,
+          drivingLicence,
+        },
+      }),
+    }),
+
+    editDeliveryManRegister: builder.mutation({
+      query: ({ id, data, addedImage, path }) => ({
+        url: `/api/deliveryman/edit/${id}`,
+        method: "PUT",
+        body: { data, addedImage, path },
+      }),
+    }),
 
     uploadImages: builder.mutation({
       query: ({ formData }) => ({
         url: "/api/upload/images",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    deliveryManRegisterimages: builder.mutation({
+      query: ({ formData }) => ({
+        url: "/api/upload/deliveryManRegisterimages",
         method: "POST",
         body: formData,
       }),
@@ -124,12 +169,52 @@ export const apiSlice = createApi({
         method: "DELETE",
       }),
     }),
+
+    getDeliveryManOrders: builder.query({
+      query: (deliveryManId) =>
+        `/api/deliveryman/orders/deliveryman/${deliveryManId}`,
+    }),
+    getAvailableOrders: builder.query({
+      query: () => `/api/deliveryman/orders/available`,
+    }),
+
+    updateOrderStatus: builder.mutation({
+      query: ({ orderId, status }) => ({
+        url: `/api/deliveryman/orders/status/${orderId}`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    pickedOrders: builder.mutation({
+      query: ({ orderId }) => ({
+        url: `/api/deliveryman/orders/pick/${orderId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    searchQuery: builder.mutation({
+      query: (searchTerm) => ({
+        url: `/api/search/searchresult/${searchTerm}`,
+        method: "POST",
+      }),
+    }),
+    addSearchHistory: builder.mutation({
+      query: ({ searchUser }) => ({
+        url: "/api/search/addsearchhistory",
+        method: "PUT",
+        body: { searchUser },
+      }),
+    }),
   }),
 });
 
 export const {
   useLoginMutation,
   useRegisterMutation,
+  useDeliveryManRegisterMutation,
+  useEditDeliveryManRegisterMutation,
+  useDeliveryManRegisterimagesMutation,
   useUploadImagesMutation,
   useRegisterRestaurantMutation,
   useMyRestaurantQuery,
@@ -147,4 +232,10 @@ export const {
   useOrderStatusMutation,
   useRestaurantOverViewQuery,
   useDeleteOrderItemMutation,
+  useGetDeliveryManOrdersQuery,
+  useUpdateOrderStatusMutation,
+  useGetAvailableOrdersQuery,
+  usePickedOrdersMutation,
+  useSearchQueryMutation,
+  useAddSearchHistoryMutation,
 } = apiSlice;

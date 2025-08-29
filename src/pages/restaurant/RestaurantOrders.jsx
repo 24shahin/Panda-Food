@@ -33,8 +33,6 @@ export default function RestaurantOrders() {
     }
   }, [data]);
 
-  // realtime updates with websocket-like behavior (RTK Query cache subscription)
-  // ✅ if your backend supports WebSocket/SSE, integrate here
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
@@ -121,8 +119,7 @@ export default function RestaurantOrders() {
   const STATUS_OPTIONS = [
     "Pending",
     "Preparing",
-    "Out for Delivery",
-    "Delivered",
+    "Prepared for Delivery",
     "Cancelled",
   ];
 
@@ -242,32 +239,40 @@ export default function RestaurantOrders() {
 
           {/* Status Control + Accept Button */}
           <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium">Update Status:</label>
-              <select
-                className="border px-2 py-1 rounded text-sm bg-white dark:bg-gray-700 cursor-pointer"
-                value={order.status}
-                disabled={updating}
-                onChange={(e) => handleStatusChange(order._id, e.target.value)}>
-                {STATUS_OPTIONS.map((s) => (
-                  <option key={s} value={s} className="!cursor-pointer">
-                    {s}
-                  </option>
-                ))}
-              </select>
+            {order.status === "Out for Delivery" ? (
+              <p className="font-bold">Order is Out for Delivery</p>
+            ) : order.status === "Delivered" ? (
+              <p className="font-bold">Order is Deliveried</p>
+            ) : (
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium">Update Status:</label>
+                <select
+                  className="border px-2 py-1 rounded text-sm bg-white dark:bg-gray-700 cursor-pointer"
+                  value={order.status}
+                  disabled={updating}
+                  onChange={(e) =>
+                    handleStatusChange(order._id, e.target.value)
+                  }>
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s} className="!cursor-pointer">
+                      {s}
+                    </option>
+                  ))}
+                </select>
 
-              {updating && (
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              )}
+                {updating && (
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                )}
 
-              {order.status === "Pending" && (
-                <button
-                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm cursor-pointer"
-                  onClick={() => handleStatusChange(order._id, "Preparing")}>
-                  Accept
-                </button>
-              )}
-            </div>
+                {order.status === "Pending" && (
+                  <button
+                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm cursor-pointer"
+                    onClick={() => handleStatusChange(order._id, "Preparing")}>
+                    Accept
+                  </button>
+                )}
+              </div>
+            )}
 
             <button
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400 cursor-pointer"

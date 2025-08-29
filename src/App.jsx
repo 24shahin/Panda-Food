@@ -1,6 +1,11 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -12,11 +17,9 @@ import Orders from "./pages/Orders";
 import AddressForm from "./pages/DeliveryAddressForm";
 import OrderDetails from "./pages/OrderDetails";
 import AdminOrders from "./pages/AdminOrders";
-
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthRedirectRoute from "./components/AuthRedirectRoute";
 import useAutoLogout from "./hooks/useAutoLogout";
@@ -24,18 +27,20 @@ import AdminDashboard from "./pages/AdminDashboard";
 import RestaurantSetupForm from "./pages/RestaurantSetupForm";
 import { useGetAllRestaurantQuery } from "./redux/apiSlice";
 import NewMenuAdd from "./components/Restaurant/NewMenuAdd";
-
 import { useSelector, useDispatch } from "react-redux";
 import { initCartFromLocalStorage, logoutCart } from "./redux/cartSlice";
 import { initOrdersFromLocalStorage, logoutOrders } from "./redux/ordersSlice";
 import UserAllOrdes from "./pages/UserAllOrdes";
 import DashboardLayout from "./pages/restaurant/DashboardLayout";
-
-// ✅ Import restaurant dashboard pages
 import RestaurantOverview from "./pages/restaurant/RestaurantOverview";
 import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
 import RestaurantOrders from "./pages/restaurant/RestaurantOrders";
 import RestaurantSettings from "./pages/restaurant/RestaurantSettings";
+import RegisterDeliveryMan from "./pages/Delivery-man/RegisterDeliveryMan";
+import DeliveryManLogin from "./pages/Delivery-man/DeliveryManLogin";
+import DeliveryManDashboard from "./pages/Delivery-man/DeliveryManDashboard";
+import { initDeliveryManFromLocalStorage } from "./redux/deliveryManSlice";
+import DeliveryManAvailableOrders from "./pages/AvailableOrders";
 
 export default function App() {
   return (
@@ -51,6 +56,7 @@ function AppContent() {
   const { data: allRestaurant, isLoading } = useGetAllRestaurantQuery();
 
   const user = useSelector((state) => state.auth.user);
+  const { deliveryman } = useSelector((state) => state.deliveryManAuth);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -66,6 +72,10 @@ function AppContent() {
       dispatch(logoutOrders());
     }
   }, [user, dispatch]);
+
+  useEffect(() => {
+    dispatch(initDeliveryManFromLocalStorage());
+  }, [dispatch]);
 
   return (
     <>
@@ -99,6 +109,43 @@ function AppContent() {
                 <AuthRedirectRoute>
                   <Register />
                 </AuthRedirectRoute>
+              }
+            />
+            <Route
+              path="/registerdeliveryman"
+              element={
+                <AuthRedirectRoute>
+                  <RegisterDeliveryMan />
+                </AuthRedirectRoute>
+              }
+            />
+            <Route
+              path="/deliverymanlogin"
+              element={
+                <AuthRedirectRoute>
+                  <DeliveryManLogin />
+                </AuthRedirectRoute>
+              }
+            />
+            {/* ✅ Deliveryman Dashboard Protected */}
+            <Route
+              path="/deliveryman/dashboard"
+              element={
+                deliveryman ? (
+                  <DeliveryManDashboard />
+                ) : (
+                  <Navigate to="/deliverymanlogin" replace />
+                )
+              }
+            />
+            <Route
+              path="/deliveryman/available"
+              element={
+                deliveryman ? (
+                  <DeliveryManAvailableOrders />
+                ) : (
+                  <Navigate to="/deliverymanlogin" replace />
+                )
               }
             />
 
