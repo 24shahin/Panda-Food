@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Star, MessageSquare } from "lucide-react";
 import OutSideClick from "../functions/click";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom"; // ⬅️ added useLocation
 import { useSelector } from "react-redux";
 import {
   useMyRestaurantQuery,
@@ -38,6 +38,7 @@ const sampleComments = [
 export default function RestaurantDetails() {
   const userInfo = useSelector((state) => state?.auth);
   const { id } = useParams();
+  const location = useLocation(); // ⬅️ added
   const navigate = useNavigate();
 
   const isVisitor = !!id;
@@ -85,6 +86,22 @@ export default function RestaurantDetails() {
 
     return () => clearInterval(interval);
   }, [restaurants]);
+
+  // ⬅️ Highlight & Scroll effect
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const highlightId = queryParams.get("highlight");
+    if (highlightId) {
+      const element = document.getElementById(`menu-${highlightId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.classList.add("bg-red-200");
+        setTimeout(() => {
+          element.classList.remove("bg-red-200");
+        }, 3000);
+      }
+    }
+  }, [location, restaurants]);
 
   if (isLoading || !restaurants) {
     return (
@@ -230,6 +247,7 @@ export default function RestaurantDetails() {
             .map((item, index) => (
               <motion.div
                 key={item._id}
+                id={`menu-${item._id}`} // ⬅️ important for highlight
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}

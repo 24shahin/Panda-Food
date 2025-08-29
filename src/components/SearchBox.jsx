@@ -82,7 +82,7 @@ function SearchBox() {
             <p className="font-gilBold text-sm ">Recent searches</p>
           ))}
         <div>
-          {/* {getSearchhHistory &&
+          {getSearchhHistory &&
             searchResult == "" &&
             getSearchhHistory.map((searchUser) => (
               <div
@@ -110,7 +110,7 @@ function SearchBox() {
                   <CrossIcon />
                 </div>
               </div>
-            ))} */}
+            ))}
         </div>
         {searchResult?.map((item) => (
           <div
