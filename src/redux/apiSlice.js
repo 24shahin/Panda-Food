@@ -200,10 +200,19 @@ export const apiSlice = createApi({
       }),
     }),
     addSearchHistory: builder.mutation({
-      query: ({ searchUser }) => ({
+      query: ({ menuItem, restaurant }) => ({
         url: "/api/search/addsearchhistory",
         method: "PUT",
-        body: { searchUser },
+        body: { menuItem, restaurant },
+      }),
+    }),
+    getSearchhHistory: builder.query({
+      query: () => "/api/search/getsearchhistory",
+    }),
+    removeSearchHistory: builder.mutation({
+      query: (searchId) => ({
+        url: `/api/search/deletesearchhistory/${searchId}`,
+        method: "PUT",
       }),
     }),
   }),
@@ -238,4 +247,6 @@ export const {
   usePickedOrdersMutation,
   useSearchQueryMutation,
   useAddSearchHistoryMutation,
+  useGetSearchhHistoryQuery,
+  useRemoveSearchHistoryMutation,
 } = apiSlice;

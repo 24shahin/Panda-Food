@@ -12,6 +12,7 @@ export default function MenuItem({
   visitor,
   restaurantId,
   restaurantName,
+  className,
   onItemUpdated = () => {},
 }) {
   const dispatch = useDispatch();
@@ -42,7 +43,7 @@ export default function MenuItem({
   };
 
   return (
-    <div className="bg-white relative dark:bg-gray-800 border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition">
+    <div className={`relative ${className}`}>
       {/* FORM SECTION (Admin only) */}
       {showForm && (
         <div

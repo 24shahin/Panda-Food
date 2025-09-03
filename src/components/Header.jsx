@@ -56,9 +56,7 @@ export default function Header() {
   const [showSearchBox, setShowSearchBox] = useState(false);
   const searchRef = useRef(null);
   OutSideClick(searchRef, () => setShowSearchBox(false));
-  const handleSearch = () => {
-    searchRef.current.focus();
-  };
+
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
@@ -87,8 +85,8 @@ export default function Header() {
             {showSearchBox && (
               <div
                 ref={searchRef}
-                className="absolute top-0 left-0 w-full h-48 bg-white dark:bg-gray-700 rounded-md overflow-hidden">
-                <SearchBox />
+                className="absolute top-0 left-0 w-full h-56 bg-white dark:bg-gray-700 rounded-md">
+                <SearchBox setShowSearchBox={setShowSearchBox} />
               </div>
             )}
           </div>

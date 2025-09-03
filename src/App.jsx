@@ -22,7 +22,6 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthRedirectRoute from "./components/AuthRedirectRoute";
-import useAutoLogout from "./hooks/useAutoLogout";
 import AdminDashboard from "./pages/AdminDashboard";
 import RestaurantSetupForm from "./pages/RestaurantSetupForm";
 import { useGetAllRestaurantQuery } from "./redux/apiSlice";
@@ -51,7 +50,6 @@ export default function App() {
 }
 
 function AppContent() {
-  useAutoLogout();
   const [getAllRestaurant, setGetAllRestaurant] = useState([]);
   const { data: allRestaurant, isLoading } = useGetAllRestaurantQuery();
 

@@ -60,6 +60,7 @@ export default function RestaurantDetails() {
   const [commentBoxShow, setCommentBoxShow] = useState(false);
   const [userCommentShow, setUserCommentShow] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [highlightedId, setHighlightedId] = useState(null);
 
   const MenuRef = useRef(null);
   const commentRef = useRef(null);
@@ -92,12 +93,12 @@ export default function RestaurantDetails() {
     const queryParams = new URLSearchParams(location.search);
     const highlightId = queryParams.get("highlight");
     if (highlightId) {
+      setHighlightedId(highlightId); // ⬅️ save in state
       const element = document.getElementById(`menu-${highlightId}`);
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
-        element.classList.add("bg-red-200");
         setTimeout(() => {
-          element.classList.remove("bg-red-200");
+          setHighlightedId(null);
         }, 3000);
       }
     }
@@ -264,6 +265,9 @@ export default function RestaurantDetails() {
                       refetchSelectedRestaurant();
                     }
                   }}
+                  className={`bg-white dark:bg-gray-800 border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition ${
+                    highlightedId === item._id ? "!bg-red-200" : ""
+                  }`}
                 />
               </motion.div>
             ))
