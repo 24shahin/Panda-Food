@@ -64,6 +64,14 @@ const authSlice = createSlice({
       localStorage.removeItem("user");
       localStorage.removeItem("token");
     },
+    updateUser: (state, action) => {
+      // action.payload should be the complete, updated user object
+      state.user = action.payload;
+      // Also update the token if it's part of the payload, otherwise keep the existing one
+      state.token = action.payload.token || state.token;
+      // Update localStorage to stay in sync
+      localStorage.setItem("user", JSON.stringify(action.payload));
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -116,5 +124,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, updateUser } = authSlice.actions;
 export default authSlice.reducer;

@@ -55,8 +55,8 @@ export default function Checkout() {
     return groups;
   }, {});
 
-  const FREE_DELIVERY_THRESHOLD = 50;
-  const BASE_DELIVERY_FEE = 3.99;
+  const FREE_DELIVERY_THRESHOLD = 800;
+  const BASE_DELIVERY_FEE = 34;
   const subtotal = selectedItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
@@ -203,7 +203,7 @@ export default function Checkout() {
                         </div>
                       </div>
                       <p className="font-semibold">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ৳ {(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   ))}
@@ -211,17 +211,17 @@ export default function Checkout() {
               ))}
 
               <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
-                <p className="mb-1">Subtotal: ${subtotal.toFixed(2)}</p>
+                <p className="mb-1">Subtotal: ৳ {subtotal.toFixed(2)}</p>
                 <p className="mb-1">
                   Delivery Fee:{" "}
                   {deliveryFee === 0 ? (
                     <span className="text-green-600 font-semibold">Free</span>
                   ) : (
-                    `$${deliveryFee.toFixed(2)}`
+                    `৳ ${deliveryFee.toFixed(2)}`
                   )}
                 </p>
                 <p className="text-lg font-bold mt-2">
-                  Total: ${total.toFixed(2)}
+                  Total: ৳ {total.toFixed(2)}
                 </p>
               </div>
 

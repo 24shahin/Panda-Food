@@ -54,7 +54,7 @@ const OrderDetails = () => {
           </span>
         </p>
         <p>
-          <strong>Total Price:</strong> ${order.totalPrice}
+          <strong>Total Price:</strong> ৳ {order.totalPrice}
         </p>
         <p>
           <strong>Created At:</strong>{" "}
@@ -83,12 +83,12 @@ const OrderDetails = () => {
                   <div>
                     <p className="font-medium">{item.menuItem.name}</p>
                     <p className="text-sm text-gray-500">
-                      Qty: {item.quantity} × ${item.menuItem.price}
+                      Qty: {item.quantity} × ৳ {item.menuItem.price}
                     </p>
                   </div>
                 </div>
                 <p className="font-semibold">
-                  ${(item.menuItem.price * item.quantity).toFixed(2)}
+                  ৳ {(item.menuItem.price * item.quantity).toFixed(2)}
                 </p>
               </li>
             ))}

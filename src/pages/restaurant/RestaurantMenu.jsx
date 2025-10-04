@@ -95,6 +95,7 @@ export default function RestaurantMenu() {
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .map((item, index) => (
             <motion.div
+              className="border p-3 rounded-sm border-gray-300 bg-white dark:bg-gray-800"
               key={item._id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

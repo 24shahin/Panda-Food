@@ -40,6 +40,7 @@ import DeliveryManLogin from "./pages/Delivery-man/DeliveryManLogin";
 import DeliveryManDashboard from "./pages/Delivery-man/DeliveryManDashboard";
 import { initDeliveryManFromLocalStorage } from "./redux/deliveryManSlice";
 import DeliveryManAvailableOrders from "./pages/AvailableOrders";
+import CompleteOrders from "./pages/Delivery-man/CompleteOrders";
 
 export default function App() {
   return (
@@ -131,6 +132,16 @@ function AppContent() {
               element={
                 deliveryman ? (
                   <DeliveryManDashboard />
+                ) : (
+                  <Navigate to="/deliverymanlogin" replace />
+                )
+              }
+            />
+            <Route
+              path="/deliveryman/completeorder"
+              element={
+                deliveryman ? (
+                  <CompleteOrders />
                 ) : (
                   <Navigate to="/deliverymanlogin" replace />
                 )

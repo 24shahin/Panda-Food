@@ -1,30 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
-import { LuRefreshCcwDot } from "react-icons/lu";
-import {
-  useGetDeliveryManOrdersQuery,
-  useUpdateOrderStatusMutation,
-} from "../../redux/apiSlice";
-import { Link } from "react-router-dom";
+import { useGetDeliveryManOrdersQuery } from "../../redux/apiSlice";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
-export default function DeliveryManDashboard() {
+function CompleteOrders() {
   const deliveryManInfo = useSelector(
     (state) => state?.deliveryManAuth?.deliveryman
   );
-
+  const navigate = useNavigate();
   const {
     data: orders,
     isLoading,
     refetch,
   } = useGetDeliveryManOrdersQuery(deliveryManInfo?._id);
-  const [updateOrderStatus] = useUpdateOrderStatusMutation();
   const [pickedOrders, setPickedOrders] = useState([]);
   useEffect(() => {
     if (orders) {
+      // ✅ Hide delivered orders
       const filteredOrders = orders.filter(
-        (order) => order.status !== "Delivered"
+        (order) => order.status === "Delivered"
       );
       setPickedOrders(filteredOrders);
     }
@@ -35,45 +30,15 @@ export default function DeliveryManDashboard() {
       <p className="text-center text-red-500">Please login as delivery man.</p>
     );
   }
-
-  if (isLoading) {
-    return <p className="text-center">Loading orders...</p>;
-  }
-
-  const handleStatusUpdate = async (orderId, newStatus) => {
-    try {
-      await updateOrderStatus({ orderId, status: newStatus }).unwrap();
-      toast.success(`Order marked as ${newStatus}`);
-      refetch();
-    } catch (error) {
-      toast.error("Failed to update order");
-    }
-  };
-
   return (
     <div className="max-w-7xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">📦 My Assigned Orders</h1>
-
-      <div className="flex gap-x-4">
-        <button
-          onClick={refetch}
-          className="flex gap-x-2 items-center mb-4 px-4 py-2 bg-orange-300 text-black rounded hover:bg-orange-200 cursor-pointer">
-          <LuRefreshCcwDot /> Refresh Orders
-        </button>
-        <Link
-          to={"/deliveryman/available"}
-          className="mb-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/70 cursor-pointer">
-          See available Orders
-        </Link>
-        <Link
-          to={"/deliveryman/completeorder"}
-          className="mb-4 px-4 py-2 bg-primary/60 text-white rounded hover:bg-primary/70 cursor-pointer">
-          See complete Orders
-        </Link>
-      </div>
-
+      <button
+        className="mb-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/70 cursor-pointer"
+        onClick={() => navigate(-1)}>
+        Go Back
+      </button>
       {pickedOrders?.length === 0 ? (
-        <p>No assigned orders yet.</p>
+        <p>No complete orders yet.</p>
       ) : (
         <div className="space-y-4">
           {pickedOrders?.map((order) => (
@@ -88,7 +53,9 @@ export default function DeliveryManDashboard() {
                   <p className="font-semibold">Order ID: {order._id}</p>
                   <p className="font-bold">
                     Customer:{" "}
-                    <span className="font-normal">{order.user?.name}</span>
+                    <span className="font-normal text-green-600">
+                      {order.user?.name}
+                    </span>
                   </p>
                   <p className="font-bold mt-2">
                     Time:{" "}
@@ -261,3 +228,5 @@ export default function DeliveryManDashboard() {
     </div>
   );
 }
+
+export default CompleteOrders;

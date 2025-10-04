@@ -41,8 +41,8 @@ export default function Cart() {
   };
 
   const selectedItems = items.filter((item) => selectedIds.includes(item._id));
-  const FREE_DELIVERY_THRESHOLD = 50;
-  const BASE_DELIVERY_FEE = 3.99;
+  const FREE_DELIVERY_THRESHOLD = 800;
+  const BASE_DELIVERY_FEE = 34;
   const subtotal = selectedItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
@@ -109,7 +109,7 @@ export default function Cart() {
                         {item.name}
                       </h2>
                       <p className="text-gray-500 w-1/4">
-                        ${Number(item.price).toFixed(2)}
+                        ৳{Number(item.price).toFixed(2)}
                       </p>
                       <div className="flex items-center space-x-2 w-1/4">
                         <button
@@ -125,7 +125,7 @@ export default function Cart() {
                         </button>
                       </div>
                       <p className="px-2 py-1">
-                        ${(item.quantity * Number(item.price)).toFixed(2)}
+                        ৳{(item.quantity * Number(item.price)).toFixed(2)}
                       </p>
                     </div>
                     <button
@@ -143,16 +143,16 @@ export default function Cart() {
           <div className="p-4 w-3/12 border border-gray-200 rounded-md shadow-sm">
             <h3 className="text-xl font-semibold mb-2">Checkout Summary</h3>
             <p className="mb-1">Selected Items: {selectedItems.length}</p>
-            <p className="mb-1">Subtotal: ${subtotal.toFixed(2)}</p>
+            <p className="mb-1">Subtotal: ৳{subtotal.toFixed(2)}</p>
             <p className="mb-1">
               Delivery:{" "}
               {deliveryFee === 0 ? (
                 <span className="text-green-600 font-medium">Free</span>
               ) : (
-                `$${deliveryFee.toFixed(2)}`
+                `৳${deliveryFee.toFixed(2)}`
               )}
             </p>
-            <p className="font-bold text-lg">Total: ${total.toFixed(2)}</p>
+            <p className="font-bold text-lg">Total: ৳{total.toFixed(2)}</p>
             <button
               disabled={selectedItems.length === 0}
               onClick={() => navigate("/checkout")}

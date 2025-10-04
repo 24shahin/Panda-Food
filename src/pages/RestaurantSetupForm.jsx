@@ -9,11 +9,14 @@ import {
 } from "../redux/apiSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { updateUser } from "../redux/authSlice";
 
 export default function RestaurantSetupForm() {
   const userInfo = useSelector((state) => state?.auth);
-  const navigate = useNavigate();
+  console.log(userInfo?.user?.role);
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [uploadImages, { isLoading, error }] = useUploadImagesMutation();
   const [registerRestaurant] = useRegisterRestaurantMutation();
 
@@ -83,7 +86,11 @@ export default function RestaurantSetupForm() {
         email: form.email,
         images: responsImage,
       }).unwrap();
-
+      const updatedUser = {
+        ...userInfo.user,
+        role: "restaurant",
+      };
+      dispatch(updateUser(updatedUser));
       toast.success("Successfully register for restaurant business");
       setTimeout(() => {
         navigate(`/restaurant/${registerRestaurantInfo.user}`);

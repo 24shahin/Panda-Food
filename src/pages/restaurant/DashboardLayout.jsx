@@ -1,11 +1,13 @@
 import React from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LayoutDashboard, Utensils, ShoppingBag, Settings } from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function DashboardLayout() {
   const location = useLocation();
-
+  const userInfo = useSelector((state) => state?.auth?.user);
+  const navigate = useNavigate();
   const links = [
     {
       to: "/restaurant/dashboard/overview",
@@ -16,7 +18,9 @@ export default function DashboardLayout() {
     { to: "/restaurant/dashboard/orders", label: "Orders", icon: ShoppingBag },
     { to: "/restaurant/dashboard/settings", label: "Settings", icon: Settings },
   ];
-
+  const handleRedirect = () => {
+    navigate(`/restaurant/${userInfo?._id}`);
+  };
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
@@ -25,7 +29,11 @@ export default function DashboardLayout() {
         animate={{ x: 0 }}
         transition={{ duration: 0.3 }}
         className="w-64 bg-white dark:bg-gray-800 shadow-lg p-4 flex flex-col">
-        <h1 className="text-2xl font-bold mb-6 text-orange-500">Restaurant</h1>
+        <h1
+          className="text-2xl font-bold mb-6 text-orange-500 cursor-pointer"
+          onClick={() => handleRedirect()}>
+          Restaurant
+        </h1>
         <nav className="space-y-2">
           {links.map(({ to, label, icon: Icon }) => (
             <Link

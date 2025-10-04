@@ -109,7 +109,15 @@ export default function Header() {
           {/* User section */}
           {user ? (
             <div className="flex items-center space-x-2">
-              <span className="hidden sm:inline">Hi, {user.name}</span>
+              <Link
+                to={
+                  user.role == "restaurant"
+                    ? "restaurant/dashboard/overview"
+                    : ""
+                }
+                className="hidden sm:inline">
+                Hi, {user.name}
+              </Link>
               {/* Logout button */}
               <button
                 onClick={handleLogout}
@@ -120,9 +128,11 @@ export default function Header() {
             </div>
           ) : deliveryManInfo ? (
             <div className="flex items-center space-x-2">
-              <span className="hidden sm:inline">
+              <Link
+                to={deliveryManInfo?.email && "/deliveryman/dashboard"}
+                className="hidden sm:inline">
                 Hi, {deliveryManInfo.name}
-              </span>
+              </Link>
               {/* Logout button */}
               <button
                 onClick={handleDeliverymanLogout}
@@ -148,18 +158,20 @@ export default function Header() {
           )}
 
           {/* Cart icon with badge */}
-          <Link
-            className="relative hover:text-secondary transition"
-            to={"/cart"}
-            title="Cart">
-            <ShoppingCart className="h-6 w-6" />
-            <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-bold rounded-full px-1 ">
-              {CartItemLength ? CartItemLength : ""}
-            </span>
-          </Link>
+          {!deliveryManInfo && (
+            <Link
+              className="relative hover:text-secondary transition"
+              to={"/cart"}
+              title="Cart">
+              <ShoppingCart className="h-6 w-6" />
+              <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-bold rounded-full px-1 ">
+                {CartItemLength ? CartItemLength : ""}
+              </span>
+            </Link>
+          )}
 
           {/* ➕ Register Restaurant (only for admin or restaurant roles) */}
-          {user && (user.role !== "admin" || user.role !== "restaurant") && (
+          {user?.role === "user" && (
             <Link
               to="/restaurant/setup"
               className="ml-2 px-3 py-1 bg-secondary text-white rounded-md hover:bg-secondary/70 transition text-sm font-semibold shadow-sm">

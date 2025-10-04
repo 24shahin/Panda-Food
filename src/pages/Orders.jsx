@@ -23,7 +23,7 @@ export default function Orders() {
   const [loading, setLoading] = useState(false);
 
   const getRemainingTime = (createdAt) => {
-    const maxCancelMinutes = 3;
+    const maxCancelMinutes = 0.2;
     const diff = moment(createdAt)
       .add(maxCancelMinutes, "minutes")
       .diff(moment(), "seconds");
